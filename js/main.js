@@ -7,9 +7,19 @@
 
   const CART_KEY = "vybein-cart-v1";
   let revealObserver = null;
-  const formatPrice = (amount) => new Intl.NumberFormat("en-IN", {
-    style: "currency", currency: "INR", maximumFractionDigits: 0
-  }).format(amount);
+  const formatPrice = (amount) => `Rs. ${new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 0
+  }).format(amount)}`;
+
+  // Show the current price beside the crossed-out original price.
+  function priceMarkup(product, quantity = 1) {
+    const currentPrice = Number(product.price || STORE_CONFIG.price) * quantity;
+    const originalPrice = Number(product.originalPrice || STORE_CONFIG.originalPrice || currentPrice) * quantity;
+    const current = `<span class="price-current">${formatPrice(currentPrice)}</span>`;
+    return originalPrice > currentPrice
+      ? `${current}<del class="price-original">${formatPrice(originalPrice)}</del>`
+      : current;
+  }
 
   // Escape catalogue values before placing them into HTML templates.
   function escapeHTML(value) {
@@ -73,18 +83,23 @@
 
   function productCard(product) {
     const name = escapeHTML(product.name);
+    const inspiredBy = escapeHTML(product.inspiredBy);
     const id = encodeURIComponent(product.id);
     const notes = escapeHTML(product.mood);
+    const category = escapeHTML(product.category);
     const badge = escapeHTML(product.badge);
     const image = escapeHTML(product.image);
     return `
       <article class="product-card" data-reveal>
         <a class="product-card-image" href="product.html?id=${id}" aria-label="View ${name}">
-          <img src="${image}" alt="Illustration of the VYBEIN ${name} perfume bottle" loading="lazy">
+          <img src="${image}" alt="Illustration of VYBEIN ${name}, inspired by ${inspiredBy}, in a perfume bottle" loading="lazy">
           <span class="product-badge">${badge}</span>
         </a>
         <div class="product-card-info">
-          <div class="product-card-title-row"><h3><a href="product.html?id=${id}">${name}</a></h3><span class="product-card-price">${formatPrice(product.price || STORE_CONFIG.price)}</span></div>
+          <div class="product-card-title-row"><h3><a href="product.html?id=${id}">${name}</a></h3></div>
+          <p class="product-card-inspired">Inspired By ${inspiredBy}</p>
+          <div class="product-card-price">${priceMarkup(product)}</div>
+          <p class="product-card-category">${category}</p>
           <p class="product-card-mood">${notes}</p>
           <div class="product-card-actions"><button class="add-button" type="button" data-add-to-cart="${escapeHTML(product.id)}">Add to bag <span aria-hidden="true">+</span></button><a class="quick-view" href="product.html?id=${id}">Discover <span class="icon-arrow" aria-hidden="true"></span></a></div>
         </div>
@@ -102,7 +117,18 @@
     let activeFilter = "all";
     const count = document.getElementById("results-count");
     function applyFilter() {
-      const filtered = activeFilter === "all" ? PRODUCTS : PRODUCTS.filter((product) => product.profile === activeFilter);
+      const filterTerms = {
+        fresh: ["fresh", "aquatic"],
+        warm: ["warm", "gourmand"],
+        woody: ["woody"],
+        spiced: ["spiced", "spicy"],
+        sweet: ["sweet", "gourmand"]
+      };
+      const terms = filterTerms[activeFilter] || [];
+      const filtered = activeFilter === "all" ? PRODUCTS : PRODUCTS.filter((product) => {
+        const category = product.category.toLowerCase();
+        return terms.some((term) => category.includes(term));
+      });
       target.innerHTML = filtered.map(productCard).join("");
       observeRevealElements(target);
       if (count) count.textContent = `${filtered.length} ${filtered.length === 1 ? "fragrance" : "fragrances"}`;
@@ -136,27 +162,30 @@
     }
 
     const safeName = escapeHTML(product.name);
+    const safeInspiredBy = escapeHTML(product.inspiredBy);
+    const safeCategory = escapeHTML(product.category);
     const safeImage = escapeHTML(product.image);
     const safePrice = formatPrice(product.price || STORE_CONFIG.price);
     if (breadcrumb) breadcrumb.textContent = product.name;
-    document.title = `${product.name} Perfume — VYBEIN`;
+    document.title = `${product.name} — Inspired By ${product.inspiredBy} | VYBEIN`;
     const description = document.querySelector('meta[name="description"]');
     const ogTitle = document.querySelector('meta[property="og:title"]');
     const ogDescription = document.querySelector('meta[property="og:description"]');
     const ogUrl = document.querySelector('meta[property="og:url"]');
-    if (description) description.content = `${product.name}: ${product.mood} Explore this VYBEIN unisex fragrance for ${safePrice}.`;
-    if (ogTitle) ogTitle.content = `${product.name} Perfume — VYBEIN`;
-    if (ogDescription) ogDescription.content = `${product.mood} Discover its notes and order for ${safePrice}.`;
+    if (description) description.content = `${product.name}, inspired by ${product.inspiredBy}. ${product.mood} Explore this VYBEIN unisex fragrance for ${safePrice}.`;
+    if (ogTitle) ogTitle.content = `${product.name} — Inspired By ${product.inspiredBy} | VYBEIN`;
+    if (ogDescription) ogDescription.content = `${product.mood} Discover ${product.category.toLowerCase()} notes and order for ${safePrice}.`;
     if (ogUrl) ogUrl.content = window.location.href;
 
     target.innerHTML = `
       <div class="product-detail-image" data-reveal><img src="${safeImage}" alt="Illustration of the VYBEIN ${safeName} bottle and fragrance label"><span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span></div>
       <section class="product-detail-copy" data-reveal>
-        <p class="eyebrow">VYBEIN · ${escapeHTML(product.profile).toUpperCase()} SCENT</p>
-        <h1>${safeName}</h1><p class="detail-price">${safePrice}</p>
+        <p class="eyebrow">VYBEIN · ${safeCategory.toUpperCase()}</p>
+        <h1>${safeName}</h1><p class="detail-inspired">Inspired By ${safeInspiredBy}</p>
+        <div class="detail-price">${priceMarkup(product)}<span class="price-saving">Save ${formatPrice((product.originalPrice || STORE_CONFIG.originalPrice) - (product.price || STORE_CONFIG.price))}</span></div>
         <p class="detail-mood">${escapeHTML(product.mood)}</p>
         <p class="detail-description">${escapeHTML(product.description)}</p>
-        <span class="profile-pill">${escapeHTML(product.profile)} · unisex</span>
+        <span class="profile-pill">${safeCategory} · unisex</span>
         <details class="scent-notes" open><summary><span>Explore the notes</span><span class="notes-count">${product.notes.length} notes</span></summary><ul class="notes-list">${product.notes.map((note) => `<li>${escapeHTML(note)}</li>`).join("")}</ul></details>
         <div class="detail-actions"><button class="button button-dark" type="button" data-add-to-cart="${escapeHTML(product.id)}">Add to bag <span aria-hidden="true">+</span></button><a class="button button-outline-dark" href="cart.html">Go to your bag <span class="icon-arrow" aria-hidden="true"></span></a></div>
         <button class="detail-share" type="button" data-share-product="${escapeHTML(product.id)}">Share this scent <span class="icon-arrow" aria-hidden="true"></span></button>
@@ -179,6 +208,8 @@
     const lines = validCart.map((item) => ({ ...item, product: findProduct(item.id) }));
     const itemQuantity = lines.reduce((sum, item) => sum + item.quantity, 0);
     const subtotal = lines.reduce((sum, item) => sum + item.quantity * (item.product.price || STORE_CONFIG.price), 0);
+    const originalSubtotal = lines.reduce((sum, item) => sum + item.quantity * (item.product.originalPrice || STORE_CONFIG.originalPrice || item.product.price || STORE_CONFIG.price), 0);
+    const savings = Math.max(0, originalSubtotal - subtotal);
     const count = document.getElementById("cart-item-count");
     const summary = document.getElementById("cart-summary");
     const checkout = document.getElementById("checkout-panel");
@@ -205,14 +236,14 @@
     itemsTarget.innerHTML = lines.map(({ id, quantity, product }) => `
       <article class="cart-line" data-reveal>
         <a class="cart-line-image" href="product.html?id=${encodeURIComponent(id)}"><img src="${escapeHTML(product.image)}" alt="Illustration of the VYBEIN ${escapeHTML(product.name)} bottle"></a>
-        <div class="cart-line-copy"><h3><a href="product.html?id=${encodeURIComponent(id)}">${escapeHTML(product.name)}</a></h3><p>${escapeHTML(product.profile)} · ${formatPrice(product.price || STORE_CONFIG.price)}</p>
+        <div class="cart-line-copy"><h3><a href="product.html?id=${encodeURIComponent(id)}">${escapeHTML(product.name)}</a></h3><p class="cart-line-inspired">Inspired By ${escapeHTML(product.inspiredBy)}</p><p>${escapeHTML(product.category)}</p>
           <div class="cart-line-controls"><div class="quantity-control" aria-label="Quantity for ${escapeHTML(product.name)}"><button type="button" data-quantity-change="-1" data-product-id="${escapeHTML(id)}" aria-label="Remove one ${escapeHTML(product.name)}" ${quantity <= 1 ? "disabled" : ""}>−</button><span>${quantity}</span><button type="button" data-quantity-change="1" data-product-id="${escapeHTML(id)}" aria-label="Add one ${escapeHTML(product.name)}">+</button></div><button class="remove-item" type="button" data-remove-item="${escapeHTML(id)}">Remove</button></div>
         </div>
-        <strong class="cart-line-price">${formatPrice(quantity * (product.price || STORE_CONFIG.price))}</strong>
+        <div class="cart-line-price">${priceMarkup(product, quantity)}</div>
       </article>`).join("");
     observeRevealElements(itemsTarget);
     if (summary) {
-      summary.innerHTML = `<p class="summary-row"><span>Items (${itemQuantity})</span><strong>${formatPrice(subtotal)}</strong></p><p class="summary-shipping">Delivery charges and timing will be confirmed on WhatsApp.</p><p class="summary-row summary-total"><span>Order total</span><strong>${formatPrice(subtotal)}</strong></p>`;
+      summary.innerHTML = `<p class="summary-row"><span>Items (${itemQuantity})</span><strong>${formatPrice(subtotal)}</strong></p><p class="summary-row summary-savings"><span>You save</span><strong>${formatPrice(savings)}</strong></p><p class="summary-shipping">Delivery charges and timing will be confirmed on WhatsApp.</p><p class="summary-row summary-total"><span>Order total</span><strong>${formatPrice(subtotal)}</strong></p>`;
     }
   }
 
@@ -389,7 +420,7 @@
     if (!product) return;
     const shareData = {
       title: `${product.name} — VYBEIN`,
-      text: `${product.mood} Explore it for ₹${product.price || STORE_CONFIG.price}.`,
+      text: `${product.mood} Explore it for ${formatPrice(product.price || STORE_CONFIG.price)}.`,
       url: window.location.href
     };
     try {

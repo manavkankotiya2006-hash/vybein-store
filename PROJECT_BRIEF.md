@@ -2,7 +2,7 @@
 
 ## Products and customers
 - Unisex perfumes
-- 8 perfumes at ₹899 each
+- 8 perfumes, sale price Rs. 899 each (original price Rs. 1,299)
 - Target customers: anyone shopping for unisex perfumes
 
 ## Brand and design
@@ -21,4 +21,4 @@ Home, Shop, Product details, About, Contact, Cart, and Checkout.
 
 ## Store details
 - Include fragrance notes, an FAQ, and an offers banner
-- Domain is owned; exact domain name was not provided
+- Domain: vybein.shop

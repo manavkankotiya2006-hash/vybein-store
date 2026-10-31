@@ -20,8 +20,8 @@ Open `index.html` in a browser. The shop, product pages, cart, and contact page 
 
 ## Editing the products
 
-Update names, prices, fragrance notes, descriptions, and image paths in `js/products.js`. Put replacement product photos in `images/` and point each product's `image` value to its file.
+Update each product's label code, `inspiredBy`, category, notes, mood, description, sale price, original price, badge, and image path in `js/products.js`. Put product photos in `images/` and point each product's `image` value to its file.
 
 ## Orders and launch details
 
-The cart is saved in the customer's browser. Checkout opens WhatsApp with the order and delivery details; payment is arranged in that chat. Replace the sample product artwork with the real bottle photos before launch. The QR image is a non-scannable placeholder. Replace the UPI placeholder if you plan to show an ID, and replace `your-domain.com` in the Open Graph tags in the HTML files with your domain.
+The cart is saved in the customer's browser. Checkout opens WhatsApp with the order and delivery details; payment is arranged in that chat. The site currently uses bottle illustrations; replace them with the real product photos when ready. The QR image is a non-scannable placeholder. Replace the UPI placeholder if you plan to show an ID. The live domain is `vybein.shop`.
