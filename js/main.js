@@ -85,7 +85,7 @@
         <div class="product-card-info">
           <div class="product-card-title-row"><h3><a href="product.html?id=${id}">${name}</a></h3><span class="product-card-price">${formatPrice(product.price || STORE_CONFIG.price)}</span></div>
           <p class="product-card-mood">${notes}</p>
-          <div class="product-card-actions"><button class="add-button" type="button" data-add-to-cart="${escapeHTML(product.id)}">Add to bag <span aria-hidden="true">+</span></button><a class="quick-view" href="product.html?id=${id}">Discover ↗</a></div>
+          <div class="product-card-actions"><button class="add-button" type="button" data-add-to-cart="${escapeHTML(product.id)}">Add to bag <span aria-hidden="true">+</span></button><a class="quick-view" href="product.html?id=${id}">Discover <span class="icon-arrow" aria-hidden="true"></span></a></div>
         </div>
       </article>`;
   }
@@ -128,7 +128,7 @@
     const relatedTarget = document.getElementById("related-products");
 
     if (!product) {
-      target.innerHTML = `<div class="not-found"><p class="eyebrow">SCENT NOT FOUND</p><h1>Let’s find you another.</h1><p>That fragrance link may be out of date. The full collection is waiting for you.</p><a class="button button-dark" href="shop.html">Explore all scents ↗</a></div>`;
+      target.innerHTML = `<div class="not-found"><p class="eyebrow">SCENT NOT FOUND</p><h1>Let’s find you another.</h1><p>That fragrance link may be out of date. The full collection is waiting for you.</p><a class="button button-dark" href="shop.html">Explore all scents <span class="icon-arrow" aria-hidden="true"></span></a></div>`;
       if (relatedTarget) relatedTarget.innerHTML = PRODUCTS.slice(0, 3).map(productCard).join("");
       return;
     }
@@ -155,7 +155,7 @@
         <span class="profile-pill">${escapeHTML(product.profile)} · unisex</span>
         <p class="notes-label">THE NOTES</p>
         <ul class="notes-list">${product.notes.map((note) => `<li>${escapeHTML(note)}</li>`).join("")}</ul>
-        <div class="detail-actions"><button class="button button-dark" type="button" data-add-to-cart="${escapeHTML(product.id)}">Add to bag <span aria-hidden="true">+</span></button><a class="button button-outline-dark" href="cart.html">Go to your bag ↗</a></div>
+        <div class="detail-actions"><button class="button button-dark" type="button" data-add-to-cart="${escapeHTML(product.id)}">Add to bag <span aria-hidden="true">+</span></button><a class="button button-outline-dark" href="cart.html">Go to your bag <span class="icon-arrow" aria-hidden="true"></span></a></div>
       </section>`;
 
     if (relatedTarget) relatedTarget.innerHTML = PRODUCTS.filter((item) => item.id !== product.id).slice(0, 3).map(productCard).join("");
@@ -182,7 +182,7 @@
     if (count) count.textContent = `${itemQuantity} ${itemQuantity === 1 ? "item" : "items"}`;
 
     if (!lines.length) {
-      itemsTarget.innerHTML = `<div class="empty-cart"><h3>Your bag is taking a little breather.</h3><p>Find a fragrance that feels like you.</p><a class="button button-dark" href="shop.html">Explore the collection ↗</a></div>`;
+      itemsTarget.innerHTML = `<div class="empty-cart"><h3>Your bag is taking a little breather.</h3><p>Find a fragrance that feels like you.</p><a class="button button-dark" href="shop.html">Explore the collection <span class="icon-arrow" aria-hidden="true"></span></a></div>`;
       if (summary) summary.innerHTML = `<p class="summary-row"><span>Subtotal</span><strong>${formatPrice(0)}</strong></p>`;
       if (checkout) checkout.classList.add("is-empty");
       if (checkoutForm) checkoutForm.hidden = true;
