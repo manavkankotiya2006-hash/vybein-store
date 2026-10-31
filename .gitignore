@@ -1,0 +1,28 @@
+# Operating-system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor backup and workspace files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local environment values and secrets
+.env
+.env.*
+!.env.example
+
+# Logs, temporary files, and local browser checks
+*.log
+*.tmp
+*.temp
+preview-*.png
+qa-*.png
+
+# Package and cache folders (the site itself needs no packages)
+node_modules/
+.npm/
+.cache/

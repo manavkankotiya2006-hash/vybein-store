@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Bag & Checkout — VYBEIN</title>
+  <meta name="description" content="Review your VYBEIN perfume order and send your details to us on WhatsApp for checkout.">
+  <meta property="og:title" content="Your Bag & Checkout — VYBEIN"><meta property="og:description" content="Your chosen VYBEIN fragrances, ready for a simple WhatsApp checkout."><meta property="og:type" content="website"><meta property="og:url" content="https://your-domain.com/cart.html"><meta property="og:image" content="https://your-domain.com/images/vybein-social.svg"><meta property="og:image:alt" content="VYBEIN unisex perfumes, ready for your order">
+  <meta name="theme-color" content="#f7f6f2">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"><script src="js/products.js" defer></script><script src="js/main.js" defer></script>
+</head>
+<body>
+  <div class="announcement"><span>YOUR NEXT SIGNATURE SCENT</span><span>ALL FRAGRANCES ₹899</span><span>ORDER ON WHATSAPP</span></div>
+  <header class="site-header"><a class="wordmark" href="index.html" aria-label="VYBEIN home">VYBEIN<span class="wordmark-dot">.</span></a><button class="menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="primary-nav"><span></span><span></span><span></span></button><nav class="primary-nav" id="primary-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="shop.html">Shop</a><a href="about.html">Our story</a><a href="contact.html">Contact</a><a class="nav-cart active" href="cart.html">Bag <span class="cart-count" data-cart-count>0</span></a></nav></header>
+  <main class="container cart-page">
+    <section class="page-hero cart-heading"><p class="eyebrow">YOUR SELECTION</p><h1>Your bag<span class="period">.</span></h1><p>One step closer to finding your scent.</p></section>
+    <div class="cart-layout">
+      <section class="cart-items-panel"><div class="cart-panel-heading"><h2>In your bag</h2><span id="cart-item-count">0 items</span></div><div id="cart-items" aria-live="polite"></div><a class="back-to-shop" href="shop.html">← Keep exploring</a></section>
+      <aside class="checkout-panel" id="checkout-panel">
+        <div class="summary-heading"><p class="eyebrow">ORDER SUMMARY</p><h2>A good choice.</h2></div>
+        <div id="cart-summary" class="cart-summary"></div>
+        <div class="checkout-flow"><span class="flow-dot">01</span><p>Send your order on WhatsApp. We’ll confirm availability and delivery details with you there.</p></div>
+        <div class="upi-box"><div class="upi-copy"><p class="eyebrow">PAYMENT BY UPI</p><strong>Pay by QR in our chat</strong><p>We’ll share our UPI QR code with you on WhatsApp after you send the order.</p><span class="upi-id-label">UPI ID <code>your-upi-id@bank</code></span></div><img src="images/upi-qr-placeholder.svg" alt="Sample UPI QR placeholder. This is not a scannable payment code; request the real QR in WhatsApp."></div>
+        <form id="checkout-form" class="checkout-form">
+          <h3>Your details</h3>
+          <label for="customer-name">Full name</label><input id="customer-name" name="name" type="text" autocomplete="name" placeholder="Your name" required>
+          <label for="customer-phone">Phone number</label><input id="customer-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]{10,}" placeholder="10-digit mobile number" required>
+          <label for="customer-address">Delivery address</label><textarea id="customer-address" name="address" rows="3" autocomplete="street-address" placeholder="House, street, area, city, state and PIN code" required></textarea>
+          <button class="button button-dark checkout-button" type="submit">Continue on WhatsApp <span aria-hidden="true">↗</span></button>
+          <p class="form-note">Your order and delivery details open in WhatsApp. No payment is collected on this website.</p>
+        </form>
+      </aside>
+    </div>
+  </main>
+  <footer class="site-footer"><div class="footer-main"><a class="wordmark wordmark-footer" href="index.html">VYBEIN<span class="wordmark-dot">.</span></a><p>Find the one that feels like you.</p><a class="footer-whatsapp" href="https://wa.me/916352349485?text=Hi%20VYBEIN%2C%20I%20have%20a%20question." target="_blank" rel="noopener">Talk to us on WhatsApp ↗</a></div><div class="footer-bottom"><span>© <span data-year></span> VYBEIN</span><span>MADE FOR YOUR POINT OF VIEW.</span><div><a href="shop.html">Shop</a><a href="about.html">Our story</a><a href="contact.html">Contact</a></div></div></footer>
+  <a class="whatsapp-float" href="https://wa.me/916352349485?text=Hi%20VYBEIN%2C%20I%20have%20a%20question." target="_blank" rel="noopener" aria-label="Chat with VYBEIN on WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2a9.82 9.82 0 0 0-8.48 14.8L2 22l5.34-1.4A9.95 9.95 0 1 0 12.04 2Zm0 17.94a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.17.83.84-3.08-.2-.32a8.12 8.12 0 1 1 6.96 3.88Zm4.45-6.08c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.23-.62.77-.76.93-.14.15-.28.17-.52.05-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.4-1.33-1.64-.14-.23-.02-.36.1-.48.1-.1.24-.27.36-.4.12-.14.16-.24.24-.4.08-.15.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.4h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.31.98 2.47c.12.15 1.69 2.58 4.09 3.62.57.25 1.02.4 1.37.51.58.18 1.1.16 1.51.1.46-.07 1.43-.58 1.63-1.14.2-.55.2-1.03.14-1.13-.06-.1-.22-.16-.46-.28Z"/></svg><span>Chat with us</span></a>
+</body>
+</html>
