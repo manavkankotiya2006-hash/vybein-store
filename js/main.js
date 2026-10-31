@@ -77,7 +77,7 @@
     const badge = escapeHTML(product.badge);
     const image = escapeHTML(product.image);
     return `
-      <article class="product-card">
+      <article class="product-card" data-reveal>
         <a class="product-card-image" href="product.html?id=${id}" aria-label="View ${name}">
           <img src="${image}" alt="Illustration of the VYBEIN ${name} perfume bottle" loading="lazy">
           <span class="product-badge">${badge}</span>
@@ -312,6 +312,34 @@
     });
   }
 
+  // Bring sections and product cards into view gently as customers scroll.
+  function setupRevealAnimations() {
+    const revealTargets = document.querySelectorAll("[data-reveal]");
+    if (!revealTargets.length) return;
+
+    // Browsers without IntersectionObserver still show all page content.
+    if (!("IntersectionObserver" in window)) {
+      revealTargets.forEach((element) => element.classList.add("is-visible"));
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries, currentObserver) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          currentObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -24px 0px" });
+
+    // Turn on hidden-before-scroll styles only when the observer is ready.
+    document.body.classList.add("motion-ready");
+    revealTargets.forEach((element, index) => {
+      element.style.setProperty("--reveal-delay", `${(index % 4) * 75}ms`);
+      observer.observe(element);
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     setupMobileMenu();
     setupQuantityControls();
@@ -323,6 +351,7 @@
     renderCartPage();
     updateCartBadges();
     setCurrentYear();
+    setupRevealAnimations();
   });
 
   window.addEventListener("storage", () => {
