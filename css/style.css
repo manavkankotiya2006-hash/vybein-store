@@ -527,7 +527,7 @@ body {
   background-color: var(--paper);
   background-image: radial-gradient(ellipse at 95% 12%, rgba(181, 138, 88, .11), transparent 30%), radial-gradient(ellipse at 0% 70%, rgba(181, 138, 88, .06), transparent 34%);
 }
-.site-header { position: sticky; top: 0; z-index: 30; box-shadow: 0 8px 24px rgba(25, 22, 20, .035); }
+.site-header { position: relative; z-index: 20; box-shadow: none; }
 .primary-nav > a { transition: color var(--ease), transform var(--ease); }
 .primary-nav > a:hover { transform: translateY(-1px); }
 .cart-count { color: #1b1510; background: #d7b486; }
