@@ -6,6 +6,7 @@
   "use strict";
 
   const CART_KEY = "vybein-cart-v1";
+  let revealObserver = null;
   const formatPrice = (amount) => new Intl.NumberFormat("en-IN", {
     style: "currency", currency: "INR", maximumFractionDigits: 0
   }).format(amount);
@@ -103,6 +104,7 @@
     function applyFilter() {
       const filtered = activeFilter === "all" ? PRODUCTS : PRODUCTS.filter((product) => product.profile === activeFilter);
       target.innerHTML = filtered.map(productCard).join("");
+      observeRevealElements(target);
       if (count) count.textContent = `${filtered.length} ${filtered.length === 1 ? "fragrance" : "fragrances"}`;
     }
     document.querySelectorAll("[data-filter]").forEach((button) => {
@@ -146,19 +148,20 @@
     if (ogDescription) ogDescription.content = `${product.mood} Discover its notes and order for ${safePrice}.`;
 
     target.innerHTML = `
-      <div class="product-detail-image"><img src="${safeImage}" alt="Illustration of the VYBEIN ${safeName} bottle and fragrance label"></div>
-      <section class="product-detail-copy">
+      <div class="product-detail-image" data-reveal><img src="${safeImage}" alt="Illustration of the VYBEIN ${safeName} bottle and fragrance label"><span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span></div>
+      <section class="product-detail-copy" data-reveal>
         <p class="eyebrow">VYBEIN · ${escapeHTML(product.profile).toUpperCase()} SCENT</p>
         <h1>${safeName}</h1><p class="detail-price">${safePrice}</p>
         <p class="detail-mood">${escapeHTML(product.mood)}</p>
         <p class="detail-description">${escapeHTML(product.description)}</p>
         <span class="profile-pill">${escapeHTML(product.profile)} · unisex</span>
-        <p class="notes-label">THE NOTES</p>
-        <ul class="notes-list">${product.notes.map((note) => `<li>${escapeHTML(note)}</li>`).join("")}</ul>
-        <div class="detail-actions"><button class="button button-dark" type="button" data-add-to-cart="${escapeHTML(product.id)}">Add to bag <span aria-hidden="true">+</span></button><a class="button button-outline-dark" href="cart.html">Go to your bag <span class="icon-arrow" aria-hidden="true"></span></a></div>
+        <details class="scent-notes" open><summary><span>Explore the notes</span><span class="notes-count">${product.notes.length} notes</span></summary><ul class="notes-list">${product.notes.map((note) => `<li>${escapeHTML(note)}</li>`).join("")}</ul></details>
+        <div class="detail-actions"><button class="button button-dark" type="button" data-add-to-cart="${escapeHTML(product.id)}">Add to bag <span aria-hidden="true">+</span></button><button class="button button-outline-dark detail-share" type="button" data-share-product="${escapeHTML(product.id)}">Share scent <span class="icon-arrow" aria-hidden="true"></span></button></div>
       </section>`;
 
     if (relatedTarget) relatedTarget.innerHTML = PRODUCTS.filter((item) => item.id !== product.id).slice(0, 3).map(productCard).join("");
+    observeRevealElements(target);
+    if (relatedTarget) observeRevealElements(relatedTarget);
   }
 
   function findProduct(id) {
@@ -182,7 +185,8 @@
     if (count) count.textContent = `${itemQuantity} ${itemQuantity === 1 ? "item" : "items"}`;
 
     if (!lines.length) {
-      itemsTarget.innerHTML = `<div class="empty-cart"><h3>Your bag is taking a little breather.</h3><p>Find a fragrance that feels like you.</p><a class="button button-dark" href="shop.html">Explore the collection <span class="icon-arrow" aria-hidden="true"></span></a></div>`;
+      itemsTarget.innerHTML = `<div class="empty-cart" data-reveal><span class="empty-cart-mark" aria-hidden="true">V.</span><h3>Your bag is taking a little breather.</h3><p>Find a fragrance that feels like you.</p><a class="button button-dark" href="shop.html">Explore the collection <span class="icon-arrow" aria-hidden="true"></span></a></div>`;
+      observeRevealElements(itemsTarget);
       if (summary) summary.innerHTML = `<p class="summary-row"><span>Subtotal</span><strong>${formatPrice(0)}</strong></p>`;
       if (checkout) checkout.classList.add("is-empty");
       if (checkoutForm) checkoutForm.hidden = true;
@@ -196,13 +200,14 @@
     if (paymentBox) paymentBox.hidden = false;
     if (flowNote) flowNote.hidden = false;
     itemsTarget.innerHTML = lines.map(({ id, quantity, product }) => `
-      <article class="cart-line">
+      <article class="cart-line" data-reveal>
         <a class="cart-line-image" href="product.html?id=${encodeURIComponent(id)}"><img src="${escapeHTML(product.image)}" alt="Illustration of the VYBEIN ${escapeHTML(product.name)} bottle"></a>
         <div class="cart-line-copy"><h3><a href="product.html?id=${encodeURIComponent(id)}">${escapeHTML(product.name)}</a></h3><p>${escapeHTML(product.profile)} · ${formatPrice(product.price || STORE_CONFIG.price)}</p>
           <div class="cart-line-controls"><div class="quantity-control" aria-label="Quantity for ${escapeHTML(product.name)}"><button type="button" data-quantity-change="-1" data-product-id="${escapeHTML(id)}" aria-label="Remove one ${escapeHTML(product.name)}" ${quantity <= 1 ? "disabled" : ""}>−</button><span>${quantity}</span><button type="button" data-quantity-change="1" data-product-id="${escapeHTML(id)}" aria-label="Add one ${escapeHTML(product.name)}">+</button></div><button class="remove-item" type="button" data-remove-item="${escapeHTML(id)}">Remove</button></div>
         </div>
         <strong class="cart-line-price">${formatPrice(quantity * (product.price || STORE_CONFIG.price))}</strong>
       </article>`).join("");
+    observeRevealElements(itemsTarget);
     if (summary) {
       summary.innerHTML = `<p class="summary-row"><span>Items (${itemQuantity})</span><strong>${formatPrice(subtotal)}</strong></p><p class="summary-shipping">Delivery charges and timing will be confirmed on WhatsApp.</p><p class="summary-row summary-total"><span>Order total</span><strong>${formatPrice(subtotal)}</strong></p>`;
     }
@@ -263,6 +268,15 @@
       const addButton = event.target.closest("[data-add-to-cart]");
       if (addButton) {
         addToCart(addButton.dataset.addToCart, Number(addButton.dataset.quantity) || 1);
+        addButton.classList.remove("is-added");
+        void addButton.offsetWidth;
+        addButton.classList.add("is-added");
+        window.setTimeout(() => addButton.classList.remove("is-added"), 750);
+        return;
+      }
+      const shareButton = event.target.closest("[data-share-product]");
+      if (shareButton) {
+        shareProduct(shareButton.dataset.shareProduct);
         return;
       }
       const quantityButton = event.target.closest("[data-quantity-change]");
@@ -306,6 +320,30 @@
     });
   }
 
+  // A fine gold progress line gives long pages a quiet scroll cue.
+  function setupScrollProgress() {
+    const progress = document.createElement("div");
+    progress.className = "scroll-progress";
+    progress.setAttribute("aria-hidden", "true");
+    document.body.append(progress);
+
+    let frameRequested = false;
+    function updateProgress() {
+      if (frameRequested) return;
+      frameRequested = true;
+      window.requestAnimationFrame(() => {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const amount = scrollable > 0 ? window.scrollY / scrollable : 0;
+        progress.style.transform = `scaleX(${Math.min(1, Math.max(0, amount))})`;
+        frameRequested = false;
+      });
+    }
+
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+    updateProgress();
+  }
+
   function setCurrentYear() {
     document.querySelectorAll("[data-year]").forEach((element) => {
       element.textContent = String(new Date().getFullYear());
@@ -313,8 +351,8 @@
   }
 
   // Bring sections and product cards into view gently as customers scroll.
-  function setupRevealAnimations() {
-    const revealTargets = document.querySelectorAll("[data-reveal]");
+  function observeRevealElements(root = document) {
+    const revealTargets = root.querySelectorAll("[data-reveal]:not(.is-visible)");
     if (!revealTargets.length) return;
 
     // Browsers without IntersectionObserver still show all page content.
@@ -323,21 +361,46 @@
       return;
     }
 
-    const observer = new IntersectionObserver((entries, currentObserver) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          currentObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: "0px 0px -24px 0px" });
+    if (!revealObserver) {
+      revealObserver = new IntersectionObserver((entries, currentObserver) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            currentObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -24px 0px" });
+    }
 
     // Turn on hidden-before-scroll styles only when the observer is ready.
     document.body.classList.add("motion-ready");
     revealTargets.forEach((element, index) => {
       element.style.setProperty("--reveal-delay", `${(index % 4) * 75}ms`);
-      observer.observe(element);
+      revealObserver.observe(element);
     });
+  }
+
+  // Share a direct perfume link with the phone's native share sheet, or copy it.
+  async function shareProduct(id) {
+    const product = findProduct(id);
+    if (!product) return;
+    const shareData = {
+      title: `${product.name} — VYBEIN`,
+      text: `${product.mood} Explore it for ₹${product.price || STORE_CONFIG.price}.`,
+      url: window.location.href
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareData.url);
+        showToast("Scent link copied to your clipboard.");
+      } else {
+        showToast("Open your browser menu to copy this scent link.");
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") showToast("We could not share the link right now.");
+    }
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -345,13 +408,14 @@
     setupQuantityControls();
     setupCheckout();
     setupContactForm();
+    setupScrollProgress();
     renderFeaturedProducts();
     renderShop();
     renderProductDetail();
     renderCartPage();
     updateCartBadges();
     setCurrentYear();
-    setupRevealAnimations();
+    observeRevealElements();
   });
 
   window.addEventListener("storage", () => {
