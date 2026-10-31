@@ -143,9 +143,11 @@
     const description = document.querySelector('meta[name="description"]');
     const ogTitle = document.querySelector('meta[property="og:title"]');
     const ogDescription = document.querySelector('meta[property="og:description"]');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
     if (description) description.content = `${product.name}: ${product.mood} Explore this VYBEIN unisex fragrance for ${safePrice}.`;
     if (ogTitle) ogTitle.content = `${product.name} Perfume — VYBEIN`;
     if (ogDescription) ogDescription.content = `${product.mood} Discover its notes and order for ${safePrice}.`;
+    if (ogUrl) ogUrl.content = window.location.href;
 
     target.innerHTML = `
       <div class="product-detail-image" data-reveal><img src="${safeImage}" alt="Illustration of the VYBEIN ${safeName} bottle and fragrance label"><span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span></div>
