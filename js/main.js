@@ -158,7 +158,8 @@
         <p class="detail-description">${escapeHTML(product.description)}</p>
         <span class="profile-pill">${escapeHTML(product.profile)} · unisex</span>
         <details class="scent-notes" open><summary><span>Explore the notes</span><span class="notes-count">${product.notes.length} notes</span></summary><ul class="notes-list">${product.notes.map((note) => `<li>${escapeHTML(note)}</li>`).join("")}</ul></details>
-        <div class="detail-actions"><button class="button button-dark" type="button" data-add-to-cart="${escapeHTML(product.id)}">Add to bag <span aria-hidden="true">+</span></button><button class="button button-outline-dark detail-share" type="button" data-share-product="${escapeHTML(product.id)}">Share scent <span class="icon-arrow" aria-hidden="true"></span></button></div>
+        <div class="detail-actions"><button class="button button-dark" type="button" data-add-to-cart="${escapeHTML(product.id)}">Add to bag <span aria-hidden="true">+</span></button><a class="button button-outline-dark" href="cart.html">Go to your bag <span class="icon-arrow" aria-hidden="true"></span></a></div>
+        <button class="detail-share" type="button" data-share-product="${escapeHTML(product.id)}">Share this scent <span class="icon-arrow" aria-hidden="true"></span></button>
       </section>`;
 
     if (relatedTarget) relatedTarget.innerHTML = PRODUCTS.filter((item) => item.id !== product.id).slice(0, 3).map(productCard).join("");
