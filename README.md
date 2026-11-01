@@ -28,4 +28,4 @@ The cart is saved in the customer's browser. Checkout opens WhatsApp with the or
 
 ## Diwali offer
 
-The shop banner, automatic “buy 2, get 1 free” cart discount, and WhatsApp order details share one setting in `js/products.js`. After Diwali, set `STORE_CONFIG.diwaliOffer.active` to `false`. This hides the banner and turns off the discount. The three fragrance education guides are on the home page.
+The homepage and shop banners, automatic “buy 2, get 1 free” cart discount, and WhatsApp order details share one setting in `js/products.js`. After Diwali, set `STORE_CONFIG.diwaliOffer.active` to `false`. This hides both banners and turns off the discount. The three fragrance education guides are on the home page.

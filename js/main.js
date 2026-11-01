@@ -540,8 +540,9 @@
 
   // The campaign flag in products.js controls both the shop banner and cart promotion.
   function setupDiwaliPromotion() {
-    const banner = document.querySelector("[data-diwali-banner]");
-    if (banner && !STORE_CONFIG.diwaliOffer?.active) banner.hidden = true;
+    document.querySelectorAll("[data-diwali-banner]").forEach((banner) => {
+      if (!STORE_CONFIG.diwaliOffer?.active) banner.hidden = true;
+    });
   }
 
   // Bring sections and product cards into view gently as customers scroll.
