@@ -956,7 +956,9 @@ body {
 .education-index { color: #98734d; font-size: 8px; font-weight: 700; letter-spacing: .15em; }
 .education-card h3 { margin: 14px 0 9px; font-family: var(--serif); font-size: clamp(22px, 2.35vw, 30px); font-weight: 400; letter-spacing: -.035em; line-height: 1.1; }
 .education-card-heading > p { margin: 0; color: var(--soft-ink); font-size: 11px; line-height: 1.65; }
+.anatomy-card { display: flex; flex-direction: column; }
 .fragrance-pyramid, .application-points, .lasting-tips { margin: 20px 0 0; padding: 0; list-style: none; }
+.anatomy-card .fragrance-pyramid { margin-top: auto; padding-top: 22px; }
 .fragrance-pyramid { display: grid; gap: 6px; }
 .fragrance-pyramid li { display: grid; grid-template-columns: 58px 1fr; gap: 10px; align-items: center; min-height: 62px; margin-inline: auto; padding: 9px 12px; border: 1px solid #e6dccf; background: #f5f0e8; }
 .fragrance-pyramid .note-top { width: 76%; }
@@ -965,13 +967,25 @@ body {
 .note-stage { color: #8e6942; font-size: 8px; font-weight: 700; letter-spacing: .12em; }
 .note-copy { font-size: 10px; font-weight: 600; }
 .note-copy small { display: block; margin-top: 3px; color: var(--soft-ink); font-size: 8px; font-weight: 400; line-height: 1.4; }
-.application-layout { display: grid; grid-template-columns: minmax(92px, .9fr) minmax(0, 1fr); align-items: center; gap: 8px; min-height: 235px; margin-top: 18px; }
-.body-map { display: block; width: 100%; max-height: 235px; overflow: visible; }
-.body-head, .body-shape { fill: #eee7dd; stroke: #8e7860; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-.body-point circle { fill: #9d7044; stroke: #fffaf3; stroke-width: 2; }
-.body-point text { fill: #fffaf3; font-family: var(--sans); font-size: 10px; font-weight: 700; text-anchor: middle; }
-.application-points { display: grid; gap: 9px; margin: 0; }
-.application-points li { display: flex; align-items: center; gap: 7px; color: #514638; font-size: 9px; line-height: 1.35; }
+.application-layout { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.application-visual { position: relative; overflow: hidden; border: 1px solid #e4d7c5; background: radial-gradient(ellipse at 50% 45%, #fbf7ef, #eee5d8 72%, #e6d9c8); }
+.application-visual::after { position: absolute; right: 0; bottom: 0; left: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(153,112,67,.45), transparent); content: ""; }
+.body-map { display: block; width: 100%; height: auto; overflow: visible; }
+.body-map-halo { fill: rgba(221,207,188,.32); }
+.body-map-orbit { fill: none; stroke: rgba(160,124,84,.2); stroke-width: 1; stroke-dasharray: 2 5; }
+.body-map-caption { fill: #98734d; font-family: var(--sans); font-size: 8px; font-weight: 700; letter-spacing: 2px; text-anchor: middle; }
+.body-map-head, .body-map-figure { fill: url(#body-map-fill); stroke: #8d7256; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.body-map-detail { fill: none; stroke: rgba(255,249,239,.75); stroke-width: 1.2; stroke-linecap: round; }
+.body-map-point { transform-box: fill-box; transform-origin: center; }
+.body-map-point .point-glow { fill: url(#body-map-glow); animation: bodyPointGlow 2.4s ease-out infinite; }
+.body-map-point:nth-of-type(2) .point-glow { animation-delay: .25s; }
+.body-map-point:nth-of-type(3) .point-glow { animation-delay: .5s; }
+.body-map-point:nth-of-type(4) .point-glow { animation-delay: .75s; }
+.body-map-point .point-ring { fill: #fff9ef; stroke: #a77d50; stroke-width: 1; }
+.body-map-point .point-core { fill: #9d7044; stroke: #fffaf3; stroke-width: 1.5; }
+.body-map-point text { fill: #fffaf3; font-family: var(--sans); font-size: 10px; font-weight: 700; text-anchor: middle; }
+.application-points { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 7px; margin: 0; padding: 0; list-style: none; }
+.application-points li { display: flex; min-height: 36px; align-items: center; gap: 7px; padding: 5px 8px; border: 1px solid #e7ded2; color: #514638; background: rgba(255,253,249,.66); font-size: 9px; line-height: 1.35; }
 .application-points li span { display: grid; width: 22px; height: 22px; flex: 0 0 auto; place-items: center; border: 1px solid #d3bea2; border-radius: 50%; color: #8e6942; font-size: 8px; font-weight: 700; }
 .lasting-tips { display: grid; gap: 0; }
 .lasting-tips li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 12px 0; border-top: 1px solid #e7ded2; }
@@ -1023,10 +1037,9 @@ body {
   .education-card { padding: 20px; }
   .education-card-heading, .education-card:last-child .education-card-heading { min-height: 0; }
   .education-card h3 { font-size: 26px; }
-  .application-layout { grid-template-columns: minmax(105px,.7fr) 1fr; min-height: 210px; margin-top: 12px; }
-  .body-map { max-height: 205px; }
-  .application-points { gap: 8px; }
-  .application-points li { font-size: 10px; }
+  .application-layout { gap: 9px; margin-top: 12px; }
+  .application-points { gap: 6px; }
+  .application-points li { min-height: 36px; padding-inline: 7px; font-size: 9px; }
   .lasting-tips { grid-template-columns: 1fr; }
   .diwali-banner { grid-template-columns: 48px minmax(0,1fr); gap: 13px; min-height: 0; margin-top: 20px; padding: 19px 15px; }
   .diwali-art { min-height: 54px; }
@@ -1043,6 +1056,12 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .diwali-flame, .diwali-spark, .diwali-rangoli, .diwali-free-chip { animation: none !important; }
+}
+
+@keyframes bodyPointGlow { 0% { opacity: .68; transform: scale(.68); } 75%,100% { opacity: 0; transform: scale(1.35); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .body-map-point .point-glow { animation: none; }
 }
 
 /* Red Diwali hero ribbon: it shares the same seasonal toggle as the shop banner. */
