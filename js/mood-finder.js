@@ -99,7 +99,7 @@
           <span class="mood-match-code">${product.code}</span>
           <span class="mood-match-inspired">Inspired by ${product.inspiredBy}</span>
         </span>
-        <span class="mood-match-price">₹899&nbsp;↗</span>
+        <span class="mood-match-price">₹899 <svg class="mood-match-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M5 4h7v7"/></svg></span>
       `;
       matchList.append(link);
     });

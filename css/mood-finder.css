@@ -163,9 +163,28 @@
 }
 
 .mood-match-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   white-space: nowrap;
   font-size: 0.8rem;
   font-weight: 600;
+}
+
+.mood-match-arrow {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 180ms ease;
+}
+
+.mood-match:hover .mood-match-arrow {
+  transform: translate(2px, -2px);
 }
 
 @keyframes mood-result-in {
@@ -186,11 +205,19 @@
   .mood-match {
     padding: 0.6rem 0.7rem;
   }
+
+  .mood-match-price {
+    font-size: 0.76rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .mood-choice,
   .mood-match {
+    transition: none;
+  }
+
+  .mood-match-arrow {
     transition: none;
   }
 
