@@ -1,0 +1,40 @@
+/* Extra guidance for the separate checkout PIN code field. */
+.vybein-checkout-pin {
+  margin-top: 1rem;
+}
+
+.vybein-checkout-pin label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #25211d;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.vybein-checkout-pin input {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid #d8c9b5;
+  border-radius: 0;
+  background: #fffdfa;
+  color: #211d19;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.vybein-checkout-pin input:focus-visible {
+  border-color: #9a6d40;
+  outline: 2px solid rgba(154, 109, 64, 0.24);
+  outline-offset: 1px;
+}
+
+.vybein-checkout-hint {
+  display: block;
+  margin-top: 0.35rem;
+  color: #72685d;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
