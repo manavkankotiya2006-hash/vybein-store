@@ -5,19 +5,22 @@
   const addressWords = /address/i;
   const pinWords = /pin.?code|pincode|postal|postcode|zip/i;
 
-  function fieldDescription(field) {
+  function fieldLabelText(field) {
     const labelText = field.labels
       ? Array.from(field.labels).map((label) => label.textContent).join(" ")
       : "";
     const wrappingLabel = field.closest("label");
+    return `${labelText} ${wrappingLabel ? wrappingLabel.textContent : ""}`.toLowerCase();
+  }
+
+  function fieldDescription(field) {
     return [
       field.name,
       field.id,
       field.type,
       field.autocomplete,
       field.placeholder,
-      labelText,
-      wrappingLabel ? wrappingLabel.textContent : ""
+      fieldLabelText(field)
     ].join(" ").toLowerCase();
   }
 
@@ -27,9 +30,15 @@
       fields.find((field) => field.type === "tel");
     const address = fields.find((field) => {
       const description = fieldDescription(field);
-      return addressWords.test(description) && !pinWords.test(description);
+      const identity = [field.name, field.id, field.autocomplete].join(" ").toLowerCase();
+      // Address placeholders may mention a PIN; use the field's name/id first.
+      return addressWords.test(identity) ||
+        (addressWords.test(description) && !pinWords.test(identity));
     });
-    const pin = fields.find((field) => pinWords.test(fieldDescription(field)));
+    const pin = fields.find((field) => {
+      const identity = [field.name, field.id, field.autocomplete].join(" ").toLowerCase();
+      return pinWords.test(identity) || pinWords.test(fieldLabelText(field));
+    });
     return { mobile, address, pin };
   }
 
