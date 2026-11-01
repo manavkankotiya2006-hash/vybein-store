@@ -318,7 +318,7 @@
   function setupCheckout() {
     const form = document.getElementById("checkout-form");
     if (!form) return;
-    form.addEventListener("submit", async (event) => {
+    form.addEventListener("submit", (event) => {
       event.preventDefault();
       if (!form.reportValidity()) return;
       const cart = getCart().map((item) => ({ ...item, product: findProduct(item.id) })).filter((item) => item.product);
@@ -329,62 +329,8 @@
       const formData = new FormData(form);
       const offer = getDiwaliOffer(cart);
       const itemSubtotal = cart.reduce((sum, item) => sum + item.quantity * (item.product.price || STORE_CONFIG.price), 0);
-      const localTotal = itemSubtotal - offer.discountAmount;
-      let savedOrder = null;
-      const backend = window.VYBEIN_BACKEND;
-      const submitButton = form.querySelector('[type="submit"]');
-      const formNote = form.querySelector(".form-note");
-      const originalButtonHTML = submitButton ? submitButton.innerHTML : "";
-      const originalNote = formNote ? formNote.textContent : "";
-
-      if (backend?.configured) {
-        if (submitButton) {
-          submitButton.disabled = true;
-          submitButton.textContent = "Saving your order…";
-        }
-        if (formNote) formNote.textContent = "Saving your order securely before opening WhatsApp…";
-
-        try {
-          savedOrder = await backend.placeOrder({
-            name: String(formData.get("name") || "").trim(),
-            phone: String(formData.get("phone") || "").replace(/\D/g, ""),
-            address: String(formData.get("address") || "").trim(),
-            pincode: String(formData.get("pincode") || "").replace(/\D/g, ""),
-            items: cart.map(({ id, quantity }) => ({ id, quantity }))
-          });
-        } catch (error) {
-          const detail = String(error?.message || "");
-          const safeDetail = /^(Please enter|Enter a |Your bag|A product|Only |One or more)/i.test(detail)
-            ? detail
-            : "We could not save your order. Please try again in a moment.";
-          if (submitButton) {
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalButtonHTML;
-          }
-          if (formNote) formNote.textContent = originalNote;
-          showToast(safeDetail);
-          return;
-        }
-
-        if (submitButton) {
-          submitButton.disabled = false;
-          submitButton.innerHTML = originalButtonHTML;
-        }
-        if (formNote) formNote.textContent = `Order ${savedOrder.order_ref} saved. Your details are opening in WhatsApp.`;
-      }
-
-      const orderLines = savedOrder?.items?.length
-        ? savedOrder.items.map((item) => {
-          const quantity = Number(item.quantity) || 0;
-          const freeQuantity = Number(item.free_quantity) || 0;
-          const paidQuantity = quantity - freeQuantity;
-          const lineTotal = paidQuantity > 0
-            ? formatPrice(paidQuantity * Number(item.unit_price || 0))
-            : "FREE · Diwali offer";
-          const freeNote = freeQuantity ? ` (${paidQuantity ? `${paidQuantity} paid, ` : ""}${freeQuantity} FREE)` : "";
-          return `• ${item.name} × ${quantity}${freeNote} — ${lineTotal}`;
-        }).join("\n")
-        : cart.map((item) => {
+      const subtotal = itemSubtotal - offer.discountAmount;
+      const orderLines = cart.map((item) => {
         const freeQuantity = offer.freeByProduct.get(item.product.id) || 0;
         const paidQuantity = item.quantity - freeQuantity;
         const lineText = freeQuantity
@@ -395,14 +341,7 @@
           : "FREE · Diwali offer";
         return `• ${item.product.name} × ${item.quantity}${lineText} — ${lineTotal}`;
       }).join("\n");
-      const subtotal = Number(savedOrder?.total ?? localTotal);
-      const orderDiscount = Number(savedOrder?.discount ?? offer.discountAmount);
-      const orderSubtotal = Number(savedOrder?.subtotal ?? itemSubtotal);
-      const promotionMessage = savedOrder
-        ? orderDiscount > 0
-          ? [`Diwali offer applied: Buy ${offer.buyQuantity}, get 1 FREE.`, `Discount: −${formatPrice(orderDiscount)}.`]
-          : []
-        : offer.active
+      const promotionMessage = offer.active
         ? offer.freeQuantity
           ? [`Diwali offer applied: Buy ${offer.buyQuantity}, get 1 FREE.`, `Free perfume(s): ${offer.freeItems.map((item) => `${item.product.name} × ${item.quantity}`).join(", ")}.`, `Diwali discount: −${formatPrice(offer.discountAmount)}.`]
           : [`Diwali offer: Buy ${offer.buyQuantity}, get 1 free. Add ${offer.itemsToNextFree} more perfume${offer.itemsToNextFree === 1 ? "" : "s"} to unlock it.`]
@@ -412,7 +351,6 @@
         "",
         orderLines,
         "",
-        ...(savedOrder ? [`Order reference: ${savedOrder.order_ref}`, `Items subtotal: ${formatPrice(orderSubtotal)}`, ...(orderDiscount ? [`Discount: −${formatPrice(orderDiscount)}`] : []), ""] : []),
         ...promotionMessage,
         ...(promotionMessage.length ? [""] : []),
         `Order total: ${formatPrice(subtotal)}`,
@@ -661,7 +599,7 @@
     }
   }
 
-  function initializeStorefront() {
+  document.addEventListener("DOMContentLoaded", () => {
     setupMobileMenu();
     setupQuantityControls();
     setupCheckout();
@@ -675,34 +613,6 @@
     renderCartPage();
     updateCartBadges();
     setCurrentYear();
-    if (window.VYBEIN_BACKEND?.configured) {
-      const formNote = document.querySelector("#checkout-form .form-note");
-      if (formNote) formNote.textContent = "Your order and delivery details are saved for fulfilment, then opened in WhatsApp. No payment is collected here.";
-    }
-    observeRevealElements();
-    window.vybeinStorefrontReady = true;
-  }
-
-  document.addEventListener("DOMContentLoaded", async () => {
-    const backend = window.VYBEIN_BACKEND;
-    if (backend?.configured) {
-      const catalogLoad = backend.loadCatalog().catch((error) => {
-        console.error("VYBEIN online catalog is not available; showing the saved catalog.", error);
-        return false;
-      });
-      await Promise.race([catalogLoad, new Promise((resolve) => window.setTimeout(resolve, 1800))]);
-    }
-    initializeStorefront();
-  });
-
-  window.addEventListener("vybein:catalog-loaded", () => {
-    if (!window.vybeinStorefrontReady) return;
-    renderFeaturedProducts();
-    renderShop();
-    renderProductDetail();
-    renderCartPage();
-    updateCartBadges();
-    setupDiwaliPromotion();
     observeRevealElements();
   });
 
