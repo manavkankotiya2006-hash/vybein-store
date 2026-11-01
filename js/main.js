@@ -297,6 +297,80 @@
     });
   }
 
+  // Let visitors browse every perfume, then spray to open that scent's page.
+  function setupFragranceCarousel() {
+    const carousel = document.querySelector("[data-fragrance-carousel]");
+    if (!carousel || !PRODUCTS.length) return;
+
+    const image = carousel.querySelector("[data-carousel-image]");
+    const badge = carousel.querySelector("[data-carousel-badge]");
+    const count = carousel.querySelector("[data-carousel-count]");
+    const name = carousel.querySelector("[data-carousel-name]");
+    const inspiredBy = carousel.querySelector("[data-carousel-inspired]");
+    const progress = carousel.querySelector("[data-carousel-progress]");
+    const status = carousel.querySelector("[data-carousel-status]");
+    const sprayButton = carousel.querySelector("[data-carousel-spray]");
+    const sprayLabel = carousel.querySelector("[data-spray-label]");
+    let activeIndex = 0;
+    let redirectTimer = null;
+
+    function cancelSpray() {
+      window.clearTimeout(redirectTimer);
+      redirectTimer = null;
+      carousel.classList.remove("is-spraying");
+      sprayButton.classList.remove("is-spraying");
+      sprayLabel.textContent = "Spray & discover";
+    }
+
+    function showSlide(index) {
+      activeIndex = (index + PRODUCTS.length) % PRODUCTS.length;
+      const product = PRODUCTS[activeIndex];
+      carousel.classList.add("is-sliding");
+      image.src = product.image;
+      image.alt = `Illustration of VYBEIN ${product.name}, inspired by ${product.inspiredBy}, perfume`;
+      badge.textContent = product.badge;
+      count.innerHTML = `${String(activeIndex + 1).padStart(2, "0")} <span aria-hidden="true">/</span> ${String(PRODUCTS.length).padStart(2, "0")}`;
+      name.textContent = product.name;
+      inspiredBy.textContent = `Inspired By ${product.inspiredBy}`;
+      progress.style.width = `${((activeIndex + 1) / PRODUCTS.length) * 100}%`;
+      status.textContent = `Perfume ${activeIndex + 1} of ${PRODUCTS.length}: ${product.name}, inspired by ${product.inspiredBy}.`;
+      sprayButton.setAttribute("aria-label", `Spray ${product.name}, inspired by ${product.inspiredBy}, and view its product page`);
+      window.requestAnimationFrame(() => window.setTimeout(() => carousel.classList.remove("is-sliding"), 40));
+    }
+
+    carousel.querySelector("[data-carousel-prev]").addEventListener("click", () => {
+      cancelSpray();
+      showSlide(activeIndex - 1);
+    });
+    carousel.querySelector("[data-carousel-next]").addEventListener("click", () => {
+      cancelSpray();
+      showSlide(activeIndex + 1);
+    });
+    sprayButton.addEventListener("click", () => {
+      if (redirectTimer) return;
+      const product = PRODUCTS[activeIndex];
+      carousel.classList.add("is-spraying");
+      sprayButton.classList.add("is-spraying");
+      sprayLabel.textContent = "Opening scent…";
+      status.textContent = `A mist of ${product.name}. Opening its product page.`;
+      redirectTimer = window.setTimeout(() => {
+        window.location.href = `product.html?id=${encodeURIComponent(product.id)}`;
+      }, 680);
+    });
+
+    carousel.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") {
+        cancelSpray();
+        showSlide(activeIndex - 1);
+      } else if (event.key === "ArrowRight") {
+        cancelSpray();
+        showSlide(activeIndex + 1);
+      }
+    });
+
+    showSlide(activeIndex);
+  }
+
   function setupQuantityControls() {
     document.addEventListener("click", (event) => {
       const addButton = event.target.closest("[data-add-to-cart]");
@@ -442,6 +516,7 @@
     setupQuantityControls();
     setupCheckout();
     setupContactForm();
+    setupFragranceCarousel();
     setupScrollProgress();
     renderFeaturedProducts();
     renderShop();
