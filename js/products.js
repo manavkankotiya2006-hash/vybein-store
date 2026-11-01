@@ -15,6 +15,7 @@ const PRODUCTS = [
     notes: ["Cinnamon", "Dates", "Vanilla", "Amberwood"],
     description: "An indulgent blend of warm spices, sweet gourmand notes, and smooth vanilla. Deep, inviting, and beautifully comforting, this fragrance leaves a memorable trail wherever the night takes you.",
     image: "images/midnight-bloom.svg",
+    labelImage: "images/labels/L-KHM.webp",
     badge: "Bestseller"
   },
   {
@@ -28,6 +29,7 @@ const PRODUCTS = [
     notes: ["Pineapple", "Bergamot", "Birch", "Musk"],
     description: "A bold blend of bright fruits and refined woods, creating a confident and sophisticated character. Fresh at first, smoky in its depth, and effortlessly memorable.",
     image: "images/amber-veil.svg",
+    labelImage: "images/labels/C-AVT.webp",
     badge: "Iconic Fragrance"
   },
   {
@@ -41,6 +43,7 @@ const PRODUCTS = [
     notes: ["Amber", "Woody accords", "Musk", "Spices"],
     description: "A sophisticated combination of warm amber, smooth woods, and sensual musk. Rich yet balanced, this fragrance wraps you in an elegant trail that feels timeless.",
     image: "images/citrus-muse.svg",
+    labelImage: "images/labels/AJ-AW.webp",
     badge: "Rich & Elegant"
   },
   {
@@ -54,6 +57,7 @@ const PRODUCTS = [
     notes: ["Oud", "Sandalwood", "Cardamom", "Vanilla"],
     description: "An elegant woody composition built around precious oud, aromatic spices, and creamy sandalwood. Smooth, mysterious, and refined, it brings understated luxury to every occasion.",
     image: "images/velvet-oud.svg",
+    labelImage: "images/labels/TF-OW.webp",
     badge: "Luxury Collection"
   },
   {
@@ -67,6 +71,7 @@ const PRODUCTS = [
     notes: ["Bergamot", "Apple", "Aquatic accords", "Ambergris"],
     description: "An energetic blend of crisp fruits, refreshing aquatic notes, and warm amber undertones. Clean, vibrant, and effortlessly attractive, this fragrance is made for everyday confidence.",
     image: "images/santal-skin.svg",
+    labelImage: "images/labels/R-HWS.webp",
     badge: "Fresh Favourite"
   },
   {
@@ -80,6 +85,7 @@ const PRODUCTS = [
     notes: ["Mint", "Green Apple", "Tonka Bean", "Vanilla"],
     description: "A striking combination of fresh mint, juicy fruit, and warm vanilla. Playful yet powerful, this fragrance balances freshness and sensual sweetness with a confident finish.",
     image: "images/rose-afterglow.svg",
+    labelImage: "images/labels/V-ERS.webp",
     badge: "Bold & Magnetic"
   },
   {
@@ -93,6 +99,7 @@ const PRODUCTS = [
     notes: ["Bergamot", "Pepper", "Lavender", "Ambroxan"],
     description: "A crisp burst of fresh citrus meets aromatic spices and a deep woody-amber finish. Bold, modern, and versatile, it creates a distinctive presence from day to night.",
     image: "images/musk-theory.svg",
+    labelImage: "images/labels/D-SVG.webp",
     badge: "Signature Scent"
   },
   {
@@ -106,6 +113,7 @@ const PRODUCTS = [
     notes: ["Cardamom", "Pink Pepper", "Vanilla", "Chestnut accord"],
     description: "A captivating blend of aromatic spices, creamy sweetness, and warm chestnut-inspired notes. Smooth, comforting, and addictive, this fragrance is perfect for memorable evenings.",
     image: "images/golden-hour.svg",
+    labelImage: "images/labels/A-SWY.webp",
     badge: "Addictive Warmth"
   }
 ];

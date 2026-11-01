@@ -28,6 +28,15 @@
     })[character]);
   }
 
+  // Pair each bottle illustration with its matching front-label artwork.
+  function productArtwork(product, altText, className) {
+    return `
+      <span class="product-art ${className}">
+        <img class="product-art-base" src="${escapeHTML(product.image)}" alt="${escapeHTML(altText)}" loading="lazy">
+        <img class="product-label-overlay" src="${escapeHTML(product.labelImage)}" alt="" aria-hidden="true" loading="lazy">
+      </span>`;
+  }
+
   function getCart() {
     try {
       const stored = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
@@ -99,11 +108,10 @@
     const notes = escapeHTML(product.mood);
     const category = escapeHTML(product.category);
     const badge = escapeHTML(product.badge);
-    const image = escapeHTML(product.image);
     return `
       <article class="product-card" data-reveal>
         <a class="product-card-image" href="product.html?id=${id}" aria-label="View ${name}">
-          <img src="${image}" alt="Illustration of VYBEIN ${name}, inspired by ${inspiredBy}, in a perfume bottle" loading="lazy">
+          ${productArtwork(product, `VYBEIN ${name}, inspired by ${inspiredBy}, in a perfume bottle with its printed label`, "product-art-card")}
           <span class="product-badge">${badge}</span>
         </a>
         <div class="product-card-info">
@@ -175,7 +183,6 @@
     const safeName = escapeHTML(product.name);
     const safeInspiredBy = escapeHTML(product.inspiredBy);
     const safeCategory = escapeHTML(product.category);
-    const safeImage = escapeHTML(product.image);
     const safePrice = formatPrice(product.price || STORE_CONFIG.price);
     if (breadcrumb) breadcrumb.textContent = product.name;
     document.title = `${product.name} — Inspired By ${product.inspiredBy} | VYBEIN`;
@@ -189,7 +196,7 @@
     if (ogUrl) ogUrl.content = window.location.href;
 
     target.innerHTML = `
-      <div class="product-detail-image" data-reveal><img src="${safeImage}" alt="Illustration of the VYBEIN ${safeName} bottle and fragrance label"><span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span></div>
+      <div class="product-detail-image" data-reveal>${productArtwork(product, `VYBEIN ${safeName} perfume bottle with its printed fragrance label`, "product-art-detail")}<span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span></div>
       <section class="product-detail-copy" data-reveal>
         <p class="eyebrow">VYBEIN · ${safeCategory.toUpperCase()}</p>
         <h1>${safeName}</h1><p class="detail-inspired">Inspired By ${safeInspiredBy}</p>
@@ -290,7 +297,7 @@
       const linePrice = `${paidQuantity ? priceMarkup(product, paidQuantity) : ""}${freeQuantity ? `<span class="diwali-free-chip">${freeQuantity} FREE · DIWALI</span>` : ""}`;
       return `
       <article class="cart-line${freeQuantity ? " diwali-free-line" : ""}" data-reveal>
-        <a class="cart-line-image" href="product.html?id=${encodeURIComponent(id)}"><img src="${escapeHTML(product.image)}" alt="Illustration of the VYBEIN ${escapeHTML(product.name)} bottle"></a>
+        <a class="cart-line-image" href="product.html?id=${encodeURIComponent(id)}">${productArtwork(product, `VYBEIN ${escapeHTML(product.name)} perfume bottle with its printed label`, "product-art-cart")}</a>
         <div class="cart-line-copy"><h3><a href="product.html?id=${encodeURIComponent(id)}">${escapeHTML(product.name)}</a></h3><p class="cart-line-inspired">Inspired By ${escapeHTML(product.inspiredBy)}</p><p>${escapeHTML(product.category)}</p>
           <div class="cart-line-controls"><div class="quantity-control" aria-label="Quantity for ${escapeHTML(product.name)}"><button type="button" data-quantity-change="-1" data-product-id="${escapeHTML(id)}" aria-label="Remove one ${escapeHTML(product.name)}" ${quantity <= 1 ? "disabled" : ""}>−</button><span>${quantity}</span><button type="button" data-quantity-change="1" data-product-id="${escapeHTML(id)}" aria-label="Add one ${escapeHTML(product.name)}">+</button></div><button class="remove-item" type="button" data-remove-item="${escapeHTML(id)}">Remove</button></div>
         </div>
@@ -384,6 +391,7 @@
     if (!carousel || !PRODUCTS.length) return;
 
     const image = carousel.querySelector("[data-carousel-image]");
+    const labelImage = carousel.querySelector("[data-carousel-label]");
     const badge = carousel.querySelector("[data-carousel-badge]");
     const count = carousel.querySelector("[data-carousel-count]");
     const name = carousel.querySelector("[data-carousel-name]");
@@ -408,7 +416,8 @@
       const product = PRODUCTS[activeIndex];
       carousel.classList.add("is-sliding");
       image.src = product.image;
-      image.alt = `Illustration of VYBEIN ${product.name}, inspired by ${product.inspiredBy}, perfume`;
+      image.alt = `Illustration of VYBEIN ${product.name}, inspired by ${product.inspiredBy}, perfume bottle with its printed label`;
+      labelImage.src = product.labelImage;
       badge.textContent = product.badge;
       count.innerHTML = `${String(activeIndex + 1).padStart(2, "0")} <span aria-hidden="true">/</span> ${String(PRODUCTS.length).padStart(2, "0")}`;
       name.textContent = product.name;
