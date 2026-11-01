@@ -74,11 +74,22 @@
     const product = PRODUCTS.find((item) => item.id === String(id));
     if (!product) return;
     const cart = getCart();
+    const previousOffer = getDiwaliOffer(cart);
     const existing = cart.find((item) => item.id === product.id);
     if (existing) existing.quantity += quantity;
     else cart.push({ id: product.id, quantity });
+    const currentOffer = getDiwaliOffer(cart);
     saveCart(cart);
-    showToast(`${product.name} added to your bag`);
+    if (STORE_CONFIG.diwaliOffer?.active) {
+      if (currentOffer.freeQuantity > previousOffer.freeQuantity) {
+        showToast(`Diwali offer unlocked: ${currentOffer.freeQuantity} perfume${currentOffer.freeQuantity === 1 ? "" : "s"} free!`);
+      } else {
+        const needed = currentOffer.itemsToNextFree;
+        showToast(`${product.name} added. Add ${needed} more perfume${needed === 1 ? "" : "s"} for a free one.`);
+      }
+    } else {
+      showToast(`${product.name} added to your bag`);
+    }
   }
 
   function productCard(product) {
@@ -200,6 +211,44 @@
     return PRODUCTS.find((product) => product.id === String(id));
   }
 
+  // The lowest-priced item is free for every group of three; ties favor the most recent pick.
+  function getDiwaliOffer(items) {
+    const settings = STORE_CONFIG.diwaliOffer || {};
+    const buyQuantity = Math.max(1, Math.floor(Number(settings.buyQuantity) || 2));
+    const groupSize = buyQuantity + 1;
+    const lines = items.map((item) => {
+      const product = item.product || findProduct(item.id);
+      return product ? { id: product.id, quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)), product } : null;
+    }).filter(Boolean);
+    const totalQuantity = lines.reduce((sum, item) => sum + item.quantity, 0);
+    let freeQuantity = settings.active ? Math.floor(totalQuantity / groupSize) : 0;
+    let remainingFree = freeQuantity;
+    const freeByProduct = new Map();
+    const freeItems = [];
+
+    lines.map((item, index) => ({ ...item, cartOrder: index }))
+      .sort((a, b) => (a.product.price || STORE_CONFIG.price) - (b.product.price || STORE_CONFIG.price) || b.cartOrder - a.cartOrder)
+      .forEach((item) => {
+      if (!remainingFree) return;
+      const quantity = Math.min(item.quantity, remainingFree);
+      freeByProduct.set(item.id, quantity);
+      freeItems.push({ product: item.product, quantity });
+      remainingFree -= quantity;
+    });
+
+    const discountAmount = freeItems.reduce((sum, item) => sum + item.quantity * (item.product.price || STORE_CONFIG.price), 0);
+    return {
+      active: Boolean(settings.active),
+      buyQuantity,
+      totalQuantity,
+      freeQuantity,
+      freeByProduct,
+      freeItems,
+      discountAmount,
+      itemsToNextFree: settings.active ? groupSize - (totalQuantity % groupSize) : 0
+    };
+  }
+
   function renderCartPage() {
     const itemsTarget = document.getElementById("cart-items");
     if (!itemsTarget) return;
@@ -207,7 +256,9 @@
     const validCart = cart.filter((item) => findProduct(item.id));
     const lines = validCart.map((item) => ({ ...item, product: findProduct(item.id) }));
     const itemQuantity = lines.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = lines.reduce((sum, item) => sum + item.quantity * (item.product.price || STORE_CONFIG.price), 0);
+    const itemSubtotal = lines.reduce((sum, item) => sum + item.quantity * (item.product.price || STORE_CONFIG.price), 0);
+    const offer = getDiwaliOffer(lines);
+    const subtotal = itemSubtotal - offer.discountAmount;
     const originalSubtotal = lines.reduce((sum, item) => sum + item.quantity * (item.product.originalPrice || STORE_CONFIG.originalPrice || item.product.price || STORE_CONFIG.price), 0);
     const savings = Math.max(0, originalSubtotal - subtotal);
     const count = document.getElementById("cart-item-count");
@@ -233,17 +284,27 @@
     if (checkoutForm) checkoutForm.hidden = false;
     if (paymentBox) paymentBox.hidden = false;
     if (flowNote) flowNote.hidden = false;
-    itemsTarget.innerHTML = lines.map(({ id, quantity, product }) => `
-      <article class="cart-line" data-reveal>
+    itemsTarget.innerHTML = lines.map(({ id, quantity, product }) => {
+      const freeQuantity = offer.freeByProduct.get(product.id) || 0;
+      const paidQuantity = quantity - freeQuantity;
+      const linePrice = `${paidQuantity ? priceMarkup(product, paidQuantity) : ""}${freeQuantity ? `<span class="diwali-free-chip">${freeQuantity} FREE · DIWALI</span>` : ""}`;
+      return `
+      <article class="cart-line${freeQuantity ? " diwali-free-line" : ""}" data-reveal>
         <a class="cart-line-image" href="product.html?id=${encodeURIComponent(id)}"><img src="${escapeHTML(product.image)}" alt="Illustration of the VYBEIN ${escapeHTML(product.name)} bottle"></a>
         <div class="cart-line-copy"><h3><a href="product.html?id=${encodeURIComponent(id)}">${escapeHTML(product.name)}</a></h3><p class="cart-line-inspired">Inspired By ${escapeHTML(product.inspiredBy)}</p><p>${escapeHTML(product.category)}</p>
           <div class="cart-line-controls"><div class="quantity-control" aria-label="Quantity for ${escapeHTML(product.name)}"><button type="button" data-quantity-change="-1" data-product-id="${escapeHTML(id)}" aria-label="Remove one ${escapeHTML(product.name)}" ${quantity <= 1 ? "disabled" : ""}>−</button><span>${quantity}</span><button type="button" data-quantity-change="1" data-product-id="${escapeHTML(id)}" aria-label="Add one ${escapeHTML(product.name)}">+</button></div><button class="remove-item" type="button" data-remove-item="${escapeHTML(id)}">Remove</button></div>
         </div>
-        <div class="cart-line-price">${priceMarkup(product, quantity)}</div>
-      </article>`).join("");
+        <div class="cart-line-price">${linePrice}</div>
+      </article>`;
+    }).join("");
     observeRevealElements(itemsTarget);
     if (summary) {
-      summary.innerHTML = `<p class="summary-row"><span>Items (${itemQuantity})</span><strong>${formatPrice(subtotal)}</strong></p><p class="summary-row summary-savings"><span>You save</span><strong>${formatPrice(savings)}</strong></p><p class="summary-shipping">Delivery charges and timing will be confirmed on WhatsApp.</p><p class="summary-row summary-total"><span>Order total</span><strong>${formatPrice(subtotal)}</strong></p>`;
+      const offerSummary = offer.active
+        ? offer.freeQuantity
+          ? `<p class="summary-row diwali-discount-row"><span>Diwali offer · ${offer.freeQuantity} free</span><strong>−${formatPrice(offer.discountAmount)}</strong></p>`
+          : `<p class="diwali-offer-progress">Add ${offer.itemsToNextFree} more perfume${offer.itemsToNextFree === 1 ? "" : "s"} to unlock your free Diwali scent.</p>`
+        : "";
+      summary.innerHTML = `<p class="summary-row"><span>Items (${itemQuantity})</span><strong>${formatPrice(itemSubtotal)}</strong></p>${offerSummary}<p class="summary-row summary-savings"><span>Total saved</span><strong>${formatPrice(savings)}</strong></p><p class="summary-shipping">Delivery charges and timing will be confirmed on WhatsApp.</p><p class="summary-row summary-total"><span>Order total</span><strong>${formatPrice(subtotal)}</strong></p>`;
     }
   }
 
@@ -266,13 +327,32 @@
         return;
       }
       const formData = new FormData(form);
-      const subtotal = cart.reduce((sum, item) => sum + item.quantity * (item.product.price || STORE_CONFIG.price), 0);
-      const orderLines = cart.map((item) => `• ${item.product.name} × ${item.quantity} — ${formatPrice(item.quantity * (item.product.price || STORE_CONFIG.price))}`).join("\n");
+      const offer = getDiwaliOffer(cart);
+      const itemSubtotal = cart.reduce((sum, item) => sum + item.quantity * (item.product.price || STORE_CONFIG.price), 0);
+      const subtotal = itemSubtotal - offer.discountAmount;
+      const orderLines = cart.map((item) => {
+        const freeQuantity = offer.freeByProduct.get(item.product.id) || 0;
+        const paidQuantity = item.quantity - freeQuantity;
+        const lineText = freeQuantity
+          ? ` (${paidQuantity ? `${paidQuantity} paid, ` : ""}${freeQuantity} FREE)`
+          : "";
+        const lineTotal = paidQuantity
+          ? formatPrice(paidQuantity * (item.product.price || STORE_CONFIG.price))
+          : "FREE · Diwali offer";
+        return `• ${item.product.name} × ${item.quantity}${lineText} — ${lineTotal}`;
+      }).join("\n");
+      const promotionMessage = offer.active
+        ? offer.freeQuantity
+          ? [`Diwali offer applied: Buy ${offer.buyQuantity}, get 1 FREE.`, `Free perfume(s): ${offer.freeItems.map((item) => `${item.product.name} × ${item.quantity}`).join(", ")}.`, `Diwali discount: −${formatPrice(offer.discountAmount)}.`]
+          : [`Diwali offer: Buy ${offer.buyQuantity}, get 1 free. Add ${offer.itemsToNextFree} more perfume${offer.itemsToNextFree === 1 ? "" : "s"} to unlock it.`]
+        : [];
       const message = [
         "Hi VYBEIN, I’d like to place this order:",
         "",
         orderLines,
         "",
+        ...promotionMessage,
+        ...(promotionMessage.length ? [""] : []),
         `Order total: ${formatPrice(subtotal)}`,
         "",
         `Name: ${formData.get("name")}`,
@@ -458,6 +538,12 @@
     });
   }
 
+  // The campaign flag in products.js controls both the shop banner and cart promotion.
+  function setupDiwaliPromotion() {
+    const banner = document.querySelector("[data-diwali-banner]");
+    if (banner && !STORE_CONFIG.diwaliOffer?.active) banner.hidden = true;
+  }
+
   // Bring sections and product cards into view gently as customers scroll.
   function observeRevealElements(root = document) {
     const revealTargets = root.querySelectorAll("[data-reveal]:not(.is-visible)");
@@ -517,6 +603,7 @@
     setupCheckout();
     setupContactForm();
     setupFragranceCarousel();
+    setupDiwaliPromotion();
     setupScrollProgress();
     renderFeaturedProducts();
     renderShop();

@@ -25,3 +25,7 @@ Update each product's label code, `inspiredBy`, category, notes, mood, descripti
 ## Orders and launch details
 
 The cart is saved in the customer's browser. Checkout opens WhatsApp with the order and delivery details; payment is arranged in that chat. The site currently uses bottle illustrations; replace them with the real product photos when ready. The QR image is a non-scannable placeholder. Replace the UPI placeholder if you plan to show an ID. The live domain is `vybein.shop`.
+
+## Diwali offer
+
+The shop banner, automatic “buy 2, get 1 free” cart discount, and WhatsApp order details share one setting in `js/products.js`. After Diwali, set `STORE_CONFIG.diwaliOffer.active` to `false`. This hides the banner and turns off the discount. The three fragrance education guides are on the home page.

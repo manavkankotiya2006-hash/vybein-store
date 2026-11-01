@@ -117,5 +117,10 @@ const STORE_CONFIG = {
   upiId: "your-upi-id@bank",
   currency: "INR",
   price: 899,
-  originalPrice: 1299
+  originalPrice: 1299,
+  // Turn this off after Diwali to hide the banner and disable the offer everywhere.
+  diwaliOffer: {
+    active: true,
+    buyQuantity: 2
+  }
 };
