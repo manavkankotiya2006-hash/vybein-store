@@ -29,11 +29,16 @@
   }
 
   // Pair each bottle illustration with its matching front-label artwork.
+  // Some products ship a real photo with the label already printed on the
+  // bottle; those set labelImage to null and skip the overlay entirely.
   function productArtwork(product, altText, className) {
+    const labelOverlay = product.labelImage
+      ? `<img class="product-label-overlay" src="${escapeHTML(product.labelImage)}" alt="" aria-hidden="true" loading="lazy">`
+      : "";
     return `
       <span class="product-art ${className}">
         <img class="product-art-base" src="${escapeHTML(product.image)}" alt="${escapeHTML(altText)}" loading="lazy">
-        <img class="product-label-overlay" src="${escapeHTML(product.labelImage)}" alt="" aria-hidden="true" loading="lazy">
+        ${labelOverlay}
       </span>`;
   }
 
@@ -417,7 +422,14 @@
       carousel.classList.add("is-sliding");
       image.src = product.image;
       image.alt = `Illustration of VYBEIN ${product.name}, inspired by ${product.inspiredBy}, perfume bottle with its printed label`;
-      labelImage.src = product.labelImage;
+      // Photos already carry their printed label, so hide the overlay for them.
+      if (product.labelImage) {
+        labelImage.src = product.labelImage;
+        labelImage.hidden = false;
+      } else {
+        labelImage.src = "";
+        labelImage.hidden = true;
+      }
       badge.textContent = product.badge;
       count.innerHTML = `${String(activeIndex + 1).padStart(2, "0")} <span aria-hidden="true">/</span> ${String(PRODUCTS.length).padStart(2, "0")}`;
       name.textContent = product.name;

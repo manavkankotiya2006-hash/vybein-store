@@ -98,8 +98,10 @@ const PRODUCTS = [
     mood: "Wild freshness with a powerful signature.",
     notes: ["Bergamot", "Pepper", "Lavender", "Ambroxan"],
     description: "A crisp burst of fresh citrus meets aromatic spices and a deep woody-amber finish. Bold, modern, and versatile, it creates a distinctive presence from day to night.",
-    image: "images/musk-theory.svg",
-    labelImage: "images/labels/D-SVG.webp",
+    // Real product photo: the printed label is already on the bottle, so no
+    // separate label artwork is overlaid (see productArtwork in main.js).
+    image: "images/D-SVG-product.webp",
+    labelImage: null,
     badge: "Signature Scent"
   },
   {
