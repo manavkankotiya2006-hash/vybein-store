@@ -1074,6 +1074,15 @@ body {
   .body-map-point .point-glow { animation: none; }
 }
 
+/* Keep the brand point-of-view section centered and balanced on every screen. */
+.why-section > .section-heading { flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; }
+.why-section .section-intro { max-width: 480px; margin: 0; }
+
+/* Give the homepage offer panel a direct link to VYBEIN's Instagram profile. */
+.offer-instagram { display: inline-flex; min-height: 34px; align-items: center; gap: 9px; margin-top: 13px; padding-bottom: 3px; border-bottom: 1px solid rgba(215,180,134,.45); color: #e3c39b; font-size: 10px; font-weight: 600; transition: color var(--ease), border-color var(--ease); }
+.offer-instagram:hover { border-color: #f1d9b8; color: #fff7eb; }
+.offer-instagram .icon-arrow { color: currentColor; }
+
 /* Slim red Diwali announcement just beneath the main navigation. */
 .diwali-topbar[hidden] { display: none; }
 .diwali-topbar { position: relative; isolation: isolate; display: flex; min-height: 48px; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid rgba(244,205,151,.62); color: #fff7ea; background: linear-gradient(100deg, #9e2426, #7d171d 55%, #a32a29); }
