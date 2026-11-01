@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#171411">
+  <title>Private Store Admin — VYBEIN</title>
+  <meta name="description" content="Private VYBEIN order, product, and inventory management.">
+  <link rel="icon" type="image/png" href="images/vybein-share.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="js/backend-config.js" defer></script>
+  <script src="js/products.js" defer></script>
+  <script src="js/store-backend.js" defer></script>
+  <script src="js/admin.js" defer></script>
+</head>
+<body class="admin-page">
+  <header class="admin-header">
+    <a class="wordmark" href="index.html" aria-label="VYBEIN home">VYBEIN<span class="wordmark-dot">.</span></a>
+    <span class="admin-private-mark">PRIVATE STORE ADMIN</span>
+    <button class="admin-button admin-signout" id="admin-signout" type="button" hidden>Sign out</button>
+  </header>
+
+  <main class="admin-main">
+    <section class="admin-login-card" id="admin-login">
+      <p class="eyebrow">OWNER ACCESS</p>
+      <h1>Your store,<br><em>in your hands.</em></h1>
+      <p class="admin-lead">Sign in to see saved orders, edit perfume listings, and manage stock.</p>
+      <div class="admin-message" id="admin-message" role="status" aria-live="polite"></div>
+      <form id="admin-login-form" class="admin-form" autocomplete="on">
+        <label for="admin-email">Owner email</label>
+        <input id="admin-email" name="email" type="email" autocomplete="username" required>
+        <label for="admin-password">Password</label>
+        <input id="admin-password" name="password" type="password" autocomplete="current-password" required>
+        <button class="admin-button admin-button-primary" type="submit">Sign in securely</button>
+      </form>
+      <p class="admin-small-note">Owner accounts are created in the secure database dashboard. There is no public sign-up. <a href="SUPABASE_SETUP.md">Open the setup guide</a></p>
+    </section>
+
+    <section class="admin-dashboard" id="admin-dashboard" hidden>
+      <div class="admin-welcome-row">
+        <div><p class="eyebrow">VYBEIN · OWNER DESK</p><h1>Store overview<span>.</span></h1><p class="admin-lead">Signed in as <strong id="admin-owner-email"></strong></p></div>
+        <button class="admin-button admin-refresh" id="admin-refresh" type="button">Refresh data</button>
+      </div>
+
+      <div class="admin-stats" id="admin-stats" aria-live="polite"></div>
+      <p class="admin-message" id="dashboard-message" role="status" aria-live="polite"></p>
+
+      <nav class="admin-tabs" aria-label="Store management sections">
+        <button class="admin-tab is-active" type="button" data-admin-tab="orders">Orders</button>
+        <button class="admin-tab" type="button" data-admin-tab="products">Listings & stock</button>
+        <button class="admin-tab" type="button" data-admin-tab="settings">Store offer</button>
+      </nav>
+
+      <section class="admin-section" id="admin-orders-section">
+        <div class="admin-section-heading"><div><p class="eyebrow">CUSTOMER REQUESTS</p><h2>Orders</h2></div><span class="admin-section-count" id="admin-order-count"></span></div>
+        <div id="admin-orders" class="admin-order-list"></div>
+        <div class="admin-pagination"><button class="admin-button" id="orders-previous" type="button">Previous</button><span id="orders-page-label">Page 1</span><button class="admin-button" id="orders-next" type="button">Next</button></div>
+      </section>
+
+      <section class="admin-section" id="admin-products-section" hidden>
+        <div class="admin-section-heading"><div><p class="eyebrow">THE COLLECTION</p><h2>Listings & stock</h2></div><button class="admin-button admin-button-primary" id="add-product" type="button">Add a perfume</button></div>
+        <p class="admin-helper">Enter a stock count to track inventory. Leave stock blank to mark it as not tracked. Confirming an order reserves tracked stock; cancelling restores it.</p>
+        <div id="admin-products" class="admin-product-list"></div>
+      </section>
+
+      <section class="admin-section" id="admin-settings-section" hidden>
+        <div class="admin-section-heading"><div><p class="eyebrow">PROMOTION</p><h2>Store offer</h2></div></div>
+        <form id="admin-settings-form" class="admin-settings-card">
+          <label class="admin-checkbox"><input name="diwali_offer_active" type="checkbox"><span>Enable the Buy 2, Get 1 Free offer</span></label>
+          <label for="buy-quantity">Number of perfumes customers buy</label>
+          <input id="buy-quantity" name="buy_quantity" type="number" min="1" max="20" required>
+          <p class="admin-helper">One additional perfume is free. This setting updates the cart and is applied again when an order is saved.</p>
+          <button class="admin-button admin-button-primary" type="submit">Save offer</button>
+        </form>
+      </section>
+    </section>
+  </main>
+
+  <footer class="admin-footer"><span>VYBEIN · PRIVATE OWNER ACCESS</span><a href="index.html">Return to the store</a></footer>
+</body>
+</html>

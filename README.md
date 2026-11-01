@@ -12,10 +12,16 @@ Open `index.html` in a browser. The shop, product pages, cart, and contact page 
 - `shop.html` — all perfumes and scent filters
 - `product.html` — product details, selected with a URL such as `product.html?id=1`
 - `cart.html` — saved cart, order summary, and WhatsApp checkout
+- `admin.html` — private owner sign-in, saved orders, listings, and inventory
 - `about.html` and `contact.html` — brand and contact information
 - `css/style.css` — site styles
 - `js/main.js` — cart, menu, filters, and WhatsApp forms
-- `js/products.js` — editable products and store settings
+- `js/products.js` — fallback products and store settings
+- `js/store-backend.js` — Supabase catalog and order connection
+- `js/backend-config.js` — public Supabase URL and publishable key
+- `js/admin.js` — owner dashboard
+- `supabase/schema.sql` — database tables, order function, and access policies
+- `SUPABASE_SETUP.md` — secure backend setup instructions
 - `images/` — local illustrations and placeholders
 
 ## Editing the products
@@ -24,7 +30,7 @@ Update each product's label code, `inspiredBy`, category, notes, mood, descripti
 
 ## Orders and launch details
 
-The cart is saved in the customer's browser. Checkout opens WhatsApp with the order and delivery details; payment is arranged in that chat. The site currently uses bottle illustrations; replace them with the real product photos when ready. The QR image is a non-scannable placeholder. Replace the UPI placeholder if you plan to show an ID. The live domain is `vybein.shop`.
+The cart is saved in the customer's browser. After Supabase is connected, checkout saves order and delivery details to the private database, then opens WhatsApp with the order reference. Payment is arranged in that chat. Until you add the Supabase URL and publishable key to `js/backend-config.js`, checkout continues to use the existing WhatsApp flow and the admin page remains unconfigured. Follow `SUPABASE_SETUP.md` to activate saved orders and owner access. The live domain is `vybein.shop`.
 
 ## Diwali offer
 

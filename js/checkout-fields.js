@@ -166,10 +166,5 @@
       return;
     }
 
-    const originalAddress = address.value;
-    address.value = `${originalAddress.trim()}\nPIN Code: ${pinDigits}`;
-    requestAnimationFrame(() => {
-      address.value = originalAddress;
-    });
   }, true);
 })();

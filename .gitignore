@@ -26,3 +26,5 @@ qa-*.png
 node_modules/
 .npm/
 .cache/
+.supabase/
+supabase/.temp/
