@@ -34,6 +34,16 @@
   margin-top: 1.15rem !important;
 }
 
+.lasting-card {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-start !important;
+  height: auto;
+  min-height: 0;
+  padding-bottom: clamp(1.5rem, 3vw, 2.25rem);
+  container-type: inline-size;
+}
+
 .lasting-card .longwear-tip-item {
   display: flex !important;
   min-width: 0;
@@ -47,7 +57,7 @@
   box-sizing: border-box;
 }
 
-@media (min-width: 1120px) {
+@container (min-width: 1150px) {
   .lasting-card .longwear-tip-list {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
