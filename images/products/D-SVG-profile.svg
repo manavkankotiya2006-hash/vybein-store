@@ -1,8 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-labelledby="title description">
   <title id="title">VYBEIN D-SVG fragrance profile</title>
-  <desc id="description">A warm cream profile card for the D-SVG fragrance, with its bottle, accords, notes, and scent character.</desc>
+  <desc id="description">A warm cream profile card for D-SVG, with its bottle, fragrance accords, illustrated note photographs, scent character, and an 8.5-hour longevity detail.</desc>
   <defs>
     <clipPath id="bottle-frame"><rect x="76" y="338" width="410" height="410" rx="18"/></clipPath>
+    <clipPath id="note-bergamot"><circle cx="598" cy="710" r="16"/></clipPath>
+    <clipPath id="note-pepper"><circle cx="858" cy="710" r="16"/></clipPath>
+    <clipPath id="note-lavender"><circle cx="598" cy="775" r="16"/></clipPath>
+    <clipPath id="note-ambroxan"><circle cx="858" cy="775" r="16"/></clipPath>
     <style>
       .sans { font-family: Arial, Helvetica, sans-serif; fill: #29231e; }
       .serif { font-family: Georgia, 'Times New Roman', serif; fill: #29231e; }
@@ -52,23 +56,30 @@
   <text x="570" y="619" class="sans muted eyebrow">NOTES TO NOTICE</text>
   <text x="570" y="658" class="serif" font-size="27">A bright, aromatic blend</text>
   <rect x="570" y="686" width="245" height="48" rx="24" fill="#F5EEE4" stroke="#E0D3C4"/>
-  <text x="692" y="716" class="sans" font-size="14" text-anchor="middle">Bergamot</text>
+  <image x="582" y="694" width="32" height="32" preserveAspectRatio="xMidYMid slice" clip-path="url(#note-bergamot)" href="D-SVG-note-bergamot.webp"/>
+  <text x="626" y="716" class="sans" font-size="14">Bergamot</text>
   <rect x="830" y="686" width="276" height="48" rx="24" fill="#F5EEE4" stroke="#E0D3C4"/>
-  <text x="968" y="716" class="sans" font-size="14" text-anchor="middle">Pepper</text>
+  <image x="842" y="694" width="32" height="32" preserveAspectRatio="xMidYMid slice" clip-path="url(#note-pepper)" href="D-SVG-note-pepper.webp"/>
+  <text x="886" y="716" class="sans" font-size="14">Pepper</text>
   <rect x="570" y="751" width="245" height="48" rx="24" fill="#F5EEE4" stroke="#E0D3C4"/>
-  <text x="692" y="781" class="sans" font-size="14" text-anchor="middle">Lavender</text>
+  <image x="582" y="759" width="32" height="32" preserveAspectRatio="xMidYMid slice" clip-path="url(#note-lavender)" href="D-SVG-note-lavender.webp"/>
+  <text x="626" y="781" class="sans" font-size="14">Lavender</text>
   <rect x="830" y="751" width="276" height="48" rx="24" fill="#F5EEE4" stroke="#E0D3C4"/>
-  <text x="968" y="781" class="sans" font-size="14" text-anchor="middle">Ambroxan</text>
+  <image x="842" y="759" width="32" height="32" preserveAspectRatio="xMidYMid slice" clip-path="url(#note-ambroxan)" href="D-SVG-note-ambroxan.webp"/>
+  <text x="886" y="781" class="sans" font-size="14">Ambroxan</text>
 
   <rect x="532" y="846" width="612" height="296" rx="20" fill="#E8DDD0"/>
   <text x="570" y="893" class="sans muted eyebrow">FRAGRANCE PROFILE</text>
   <text x="570" y="942" class="serif" font-size="31">Fresh · Spicy · Woody</text>
   <text x="570" y="979" class="sans muted" font-size="14">
     <tspan x="570" dy="0">An energetic opening with a confident,</tspan>
-    <tspan x="570" dy="22">warm finish. Made to feel easy from day</tspan>
-    <tspan x="570" dy="22">through evening.</tspan>
+    <tspan x="570" dy="22">warm finish, from day through evening.</tspan>
   </text>
-  <line x1="570" y1="1060" x2="1106" y2="1060" stroke="#CDBDAA"/>
-  <text x="570" y="1096" class="sans" font-size="12" font-weight="700" letter-spacing="2">VYBEIN</text>
-  <text x="1106" y="1096" class="sans muted" font-size="11" font-weight="700" letter-spacing="1.5" text-anchor="end">D-SVG · 50 ML</text>
+  <rect x="570" y="1020" width="194" height="34" rx="17" fill="#F5EEE4" stroke="#D8C9B9"/>
+  <circle cx="589" cy="1037" r="7" fill="none" stroke="#A7794C" stroke-width="1.5"/>
+  <path d="M589 1033v4l3 2" fill="none" stroke="#A7794C" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="605" y="1041" class="sans" font-size="12" font-weight="700" letter-spacing=".6">8.5H LONGEVITY</text>
+  <line x1="570" y1="1071" x2="1106" y2="1071" stroke="#CDBDAA"/>
+  <text x="570" y="1106" class="sans" font-size="12" font-weight="700" letter-spacing="2">VYBEIN</text>
+  <text x="1106" y="1106" class="sans muted" font-size="11" font-weight="700" letter-spacing="1.5" text-anchor="end">D-SVG · 50 ML</text>
 </svg>

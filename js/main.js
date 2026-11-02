@@ -243,7 +243,7 @@
     if (ogUrl) ogUrl.content = window.location.href;
 
     target.innerHTML = `
-      <div class="product-detail-gallery" data-reveal>
+      <div class="product-detail-gallery${String(product.secondaryImage || "").toLowerCase().endsWith(".svg") ? " product-detail-gallery-profile" : ""}" data-reveal>
         <div class="product-detail-image">${productArtwork(product, `VYBEIN ${safeName} 50 ml perfume bottle with its printed fragrance label`, "product-art-detail")}<span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span>
           <button class="product-gallery-arrow product-gallery-previous" type="button" data-product-image-step="-1" aria-label="Show previous product image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg></button>
           <button class="product-gallery-arrow product-gallery-next" type="button" data-product-image-step="1" aria-label="Show next product image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></button>

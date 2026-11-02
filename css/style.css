@@ -631,6 +631,8 @@ body {
 .product-art-detail .product-art-base, .product-art-detail .product-art-alternate { border-radius: 48% 48% 1px 1px; }
 .product-detail-gallery.showing-secondary .product-art-base { opacity: 0; }
 .product-detail-gallery.showing-secondary .product-art-alternate { opacity: 1; transform: scale(1); }
+/* Keep the profile artwork inside the product arch's curved safe area. */
+.product-detail-gallery-profile.showing-secondary .product-art-detail .product-art-alternate { inset: 7%; width: 86%; height: 86%; border-radius: 18px; object-fit: contain; transform: none; }
 .product-image-caption { position: absolute; z-index: 2; right: 16px; bottom: 16px; padding: 8px 11px; color: #f9f2e8; background: rgba(25, 22, 20, .78); font-size: 8px; letter-spacing: .14em; }
 .product-gallery-arrow { position: absolute; z-index: 4; top: 50%; display: grid; width: 46px; height: 46px; place-items: center; padding: 0; border: 1px solid rgba(116, 84, 52, .26); border-radius: 50%; color: #251d14; background: rgba(255, 253, 249, .88); box-shadow: 0 5px 18px rgba(32, 24, 16, .14); transform: translateY(-50%); transition: background var(--ease), color var(--ease), transform var(--ease); cursor: pointer; }
 .product-gallery-arrow:hover { color: #fffaf2; background: #211b16; transform: translateY(-50%) scale(1.06); }
