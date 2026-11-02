@@ -1,0 +1,212 @@
+---
+import { Picture, getImage } from "astro:assets";
+import Base from "../../layouts/Base.astro";
+import ProductCard from "../../components/ProductCard.astro";
+import Arrow from "../../components/Arrow.astro";
+import Muse from "../../components/Muse.astro";
+import { PRODUCTS, productNumber, whatsappLink, type Product } from "../../data/products";
+import { productPhoto } from "../../data/images";
+import { formatPrice, offerIsLive } from "../../lib/pricing";
+
+export function getStaticPaths() {
+  return PRODUCTS.map((product) => ({ params: { slug: product.slug }, props: { product } }));
+}
+
+interface Props {
+  product: Product;
+}
+const { product } = Astro.props;
+const photo = productPhoto(product.code);
+// A JPEG share image keeps WhatsApp and Instagram link previews happy.
+const shareImage = await getImage({ src: photo, format: "jpg", width: 1000, quality: 82 });
+const number = productNumber(product);
+const index = PRODUCTS.indexOf(product);
+const related = [1, 2, 3].map((step) => PRODUCTS[(index + step) % PRODUCTS.length]);
+const saving = product.originalPrice - product.price;
+const title = `${product.code} — Inspired by ${product.inspiredBy} | VYBEIN Extrait de Parfum`;
+const description = `${product.mood} ${product.code} is a unisex ${product.category.toLowerCase()} extrait de parfum inspired by ${product.inspiredBy}. ${product.volume}, ${formatPrice(product.price)}.`;
+const orderLink = whatsappLink(`Hi VYBEIN, I'd like to order ${product.code} (inspired by ${product.inspiredBy}, ${product.volume}).`);
+const specs = [
+  ["Volume", product.volume],
+  ["Concentration", "Extrait · 30% oil"],
+  ["Family", product.category],
+  ["Wear", "Unisex"]
+];
+---
+<Base title={title} description={description} image={shareImage.src} imageAlt={`VYBEIN ${product.code} extrait de parfum`} type="product">
+  <section class="product on-noir">
+    <div class="container product-grid">
+      <div class="viewer" data-viewer data-code={product.code}>
+        <canvas tabindex="0" aria-label={`3D view of the ${product.code} bottle. Drag or use the arrow keys to turn it.`}></canvas>
+        <div class="viewer-photo arch arch-lined">
+          <Picture src={photo} formats={["avif"]} fallbackFormat="webp" widths={[480, 760, 1000]} sizes="(max-width: 900px) 88vw, 44vw" alt={`VYBEIN ${product.code} 50 ml extrait de parfum`} loading="eager" />
+        </div>
+        <div class="viewer-tools">
+          <div class="viewer-modes" role="group" aria-label="View">
+            <button type="button" data-viewer-mode="3d" aria-pressed="true">3D</button>
+            <button type="button" data-viewer-mode="photo" aria-pressed="false">Photograph</button>
+          </div>
+          <button class="viewer-cap" type="button" data-viewer-cap aria-pressed="false">Lift the cap</button>
+        </div>
+        <p class="viewer-hint" aria-hidden="true">Drag to turn</p>
+      </div>
+
+      <div class="details">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="/shop">Collection</a><span aria-hidden="true">/</span><span aria-current="page">{product.code}</span></nav>
+        <p class="eyebrow" data-enter>No. {number} · {product.category}</p>
+        <h1 class="product-name" data-enter="rise" style="--delay:0.08s">{product.code}</h1>
+        <p class="product-inspired" data-enter style="--delay:0.16s">Inspired by {product.inspiredBy}</p>
+        <p class="product-mood" data-enter style="--delay:0.24s">“{product.mood}”</p>
+
+        <div class="product-price" data-enter style="--delay:0.32s">
+          <span class="price">{formatPrice(product.price)}<del>{formatPrice(product.originalPrice)}</del></span>
+          {saving > 0 && <span class="saving">You save {formatPrice(saving)}</span>}
+        </div>
+        {offerIsLive() && <p class="festive-note" data-diwali-banner data-enter style="--delay:0.40s"><span>Diwali Edition</span> Add any three extraits — the third is our gift.</p>}
+
+        <div class="product-actions" data-enter style="--delay:0.48s">
+          <button class="btn btn-gold" type="button" data-add-to-cart={product.id}>Add to bag</button>
+          <a class="btn btn-ghost" href={orderLink} target="_blank" rel="noopener">Order on WhatsApp</a>
+        </div>
+
+        <dl class="specs" data-enter style="--delay:0.56s">
+          {specs.map(([term, value]) => <div><dt>{term}</dt><dd>{value}</dd></div>)}
+        </dl>
+        <button class="share" type="button" data-share>Share this scent <Arrow /></button>
+        <div class="product-muse"><Muse label="Scent wisdom" /></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section on-ivory composition" aria-labelledby="composition-title">
+    <div class="container composition-grid">
+      <div class="composition-copy">
+        <span class="roman" data-reveal>The composition</span>
+        <h2 class="title" id="composition-title" data-reveal="rise">A portrait <em>in scent.</em></h2>
+        <p class="composition-text" data-reveal>{product.description}</p>
+      </div>
+      <ol class="notes" aria-label="Key notes">
+        {product.notes.map((note, noteIndex) => (
+          <li data-reveal style={`--delay:${noteIndex * 0.1}s`}><span>{["I", "II", "III", "IV", "V", "VI"][noteIndex]}</span>{note}</li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section on-parchment related" aria-labelledby="related-title">
+    <div class="container">
+      <div class="heading">
+        <span class="roman" data-reveal>Continue the journey</span>
+        <h2 class="title" id="related-title" data-reveal="rise">You may also <em>adore.</em></h2>
+      </div>
+      <div class="collection-grid related-grid">
+        {related.map((item, relatedIndex) => <ProductCard product={item} delay={relatedIndex * 0.08} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { PRODUCTS, productUrl } from "../../data/products";
+  import { showToast } from "../../scripts/site";
+
+  // The 3D viewer is fetched once the page has loaded; the photograph shows until then.
+  const loadViewer = () => import("../../scripts/product-viewer");
+  if (document.readyState === "complete") loadViewer();
+  else window.addEventListener("load", loadViewer, { once: true });
+
+  // Share with the phone's share sheet, or copy the link.
+  document.querySelector("[data-share]")?.addEventListener("click", async () => {
+    const code = document.querySelector<HTMLElement>("[data-viewer]")?.dataset.code;
+    const product = PRODUCTS.find((item) => item.code === code);
+    if (!product) return;
+    const url = new URL(productUrl(product), window.location.origin).href;
+    try {
+      if (navigator.share) await navigator.share({ title: `${product.code} — VYBEIN`, text: product.mood, url });
+      else {
+        await navigator.clipboard.writeText(url);
+        showToast("Link copied — share it anywhere.");
+      }
+    } catch (error) {
+      if ((error as Error).name !== "AbortError") showToast("We could not share the link just now.");
+    }
+  });
+</script>
+
+<style>
+  .product { padding: calc(var(--header) + 34px + clamp(32px, 5vw, 72px)) 0 clamp(72px, 9vw, 120px); background: radial-gradient(ellipse at 92% 18%, rgba(90, 20, 36, .55) 0%, transparent 50%), var(--noir); }
+  .product-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: clamp(40px, 6vw, 96px); align-items: center; }
+
+  .viewer { position: relative; aspect-ratio: 4 / 5; width: min(100%, calc((100svh - var(--header) - 150px) * .8)); margin-inline: auto; }
+  .viewer canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; opacity: 0; transition: opacity 1.4s var(--ease); touch-action: pan-y; }
+  .viewer.is-ready canvas { opacity: 1; }
+  /* Feather the canvas so its edge melts into the page's burgundy glow. */
+  .viewer canvas { -webkit-mask-image: radial-gradient(ellipse 72% 66% at 50% 48%, #000 62%, transparent 100%); mask-image: radial-gradient(ellipse 72% 66% at 50% 48%, #000 62%, transparent 100%); }
+  .viewer.is-dragging canvas { cursor: grabbing; }
+  .viewer canvas:focus-visible { outline: 1px solid var(--gold); outline-offset: -1px; }
+  .viewer-photo { position: absolute; inset: 4% 10%; opacity: 0; visibility: hidden; transition: opacity .8s var(--ease), visibility .8s; background: #efe6d6; }
+  .viewer-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .show-photo .viewer-photo { opacity: 1; visibility: visible; }
+  /* The photograph holds the space until the 3D bottle is ready, then cross-fades away. */
+  .viewer:not(.is-ready) .viewer-photo { opacity: 1; visibility: visible; }
+  .viewer:not(.is-ready) .viewer-tools, .viewer:not(.is-ready) .viewer-hint { opacity: 0; pointer-events: none; }
+  .show-photo canvas { pointer-events: none; }
+  .no-webgl .viewer-tools, .no-webgl .viewer-hint { display: none; }
+  :global(html:not(.js)) .viewer-photo { opacity: 1; visibility: visible; }
+
+  .viewer-tools { position: absolute; left: 50%; bottom: 0; z-index: 2; display: flex; gap: 12px; transform: translateX(-50%); white-space: nowrap; }
+  .viewer-modes { display: flex; border: 1px solid var(--line-dark); }
+  .viewer-tools button { min-height: 40px; padding: 0 18px; border: 0; background: rgba(12, 10, 8, .6); color: var(--muted-dark); font-size: 9.5px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; transition: color .4s var(--ease), background-color .4s var(--ease); }
+  .viewer-tools button[aria-pressed="true"] { background: var(--gold); color: var(--noir); }
+  .viewer-cap { border: 1px solid var(--line-dark) !important; }
+  .viewer-cap[aria-pressed="true"] { background: rgba(12, 10, 8, .6) !important; color: var(--gold-soft) !important; }
+  .show-photo .viewer-cap { visibility: hidden; }
+  .viewer-hint { position: absolute; top: 8px; left: 50%; color: var(--muted-dark); font-family: var(--serif); font-style: italic; font-size: 14px; transform: translateX(-50%); transition: opacity .6s var(--ease); }
+  .has-interacted .viewer-hint, .show-photo .viewer-hint { opacity: 0; }
+
+  .details { display: grid; justify-items: start; gap: 18px; }
+  .crumbs { display: flex; gap: 12px; margin-bottom: 8px; color: var(--muted-dark); font-size: 10px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; }
+  .crumbs a:hover { color: var(--gold-soft); }
+  .product-name { font-size: clamp(4rem, 8vw, 7.4rem); font-weight: 300; letter-spacing: .08em; line-height: .95; }
+  .product-inspired { font-family: var(--serif); font-style: italic; font-size: 1.6rem; color: var(--gold-soft); }
+  .product-mood { max-width: 30rem; color: var(--muted-dark); font-family: var(--serif); font-size: 1.3rem; line-height: 1.5; }
+  .product-price { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin-top: 10px; }
+  .product-price .price { font-size: 2.1rem; color: var(--on-dark); }
+  .product-price del { color: var(--muted-dark); }
+  .saving { padding: 6px 12px; border: 1px solid var(--line-dark); color: var(--gold-soft); font-size: 9.5px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; }
+  .festive-note { color: var(--muted-dark); font-size: 13.5px; }
+  .festive-note span { margin-right: 8px; color: var(--gold); font-size: 9.5px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; }
+  .product-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; }
+  .specs { display: grid; grid-template-columns: repeat(4, auto); gap: 0; width: 100%; margin: 18px 0 0; border-top: 1px solid var(--line-dark); border-bottom: 1px solid var(--line-dark); }
+  .specs div { padding: 16px 14px 16px 0; }
+  .specs div + div { padding-left: 14px; border-left: 1px solid rgba(201, 164, 92, .14); }
+  .specs dt { color: var(--gold); font-size: 9px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; }
+  .specs dd { margin: 4px 0 0; font-family: var(--serif); font-size: 1.1rem; }
+  .share { display: inline-flex; align-items: center; gap: 12px; padding: 6px 0; border: 0; background: none; color: var(--muted-dark); font-size: 10px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; transition: color .4s var(--ease); }
+  .share:hover { color: var(--gold-soft); }
+  .product-muse { width: 100%; max-width: 30rem; margin-top: 12px; padding-top: 22px; border-top: 1px solid rgba(201, 164, 92, .14); color: #d9cfbf; }
+
+  .composition-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(48px, 8vw, 128px); align-items: center; }
+  .composition-copy { display: grid; justify-items: start; gap: 22px; }
+  .composition-text { max-width: 36rem; font-family: var(--serif); font-size: clamp(1.35rem, 2vw, 1.7rem); line-height: 1.5; color: #3b3127; }
+  .notes { display: grid; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line-light); }
+  .notes li { display: grid; grid-template-columns: 64px 1fr; align-items: baseline; padding: 22px 0; border-bottom: 1px solid var(--line-light); font-family: var(--serif); font-size: clamp(1.6rem, 2.6vw, 2.2rem); }
+  .notes li span { color: var(--gold-deep); font-size: 1rem; font-style: italic; }
+
+  .related-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1000px; margin-inline: auto; }
+
+  @media (max-width: 900px) {
+    .product { padding-top: calc(var(--header) + 34px + 16px); }
+    .product-grid, .composition-grid { grid-template-columns: 1fr; }
+    .viewer { width: min(100%, 460px, calc(68svh * .8)); }
+    .details { justify-items: center; text-align: center; }
+    .product-mood { margin-inline: auto; }
+    .product-actions { justify-content: center; width: 100%; }
+    .product-actions .btn { flex: 1 1 220px; }
+    .specs { grid-template-columns: repeat(2, 1fr); }
+    .specs div:nth-child(3) { padding-left: 0; border-left: 0; }
+    .specs div:nth-child(n + 3) { border-top: 1px solid rgba(201, 164, 92, .14); }
+    .related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .related-grid > :global(:nth-child(3)) { display: none; }
+  }
+</style>

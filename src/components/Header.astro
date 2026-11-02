@@ -1,0 +1,45 @@
+---
+import { STORE } from "../data/products";
+import { offerIsLive } from "../lib/pricing";
+
+interface Props {
+  /** Pages without a dark hero keep the bar filled from the start. */
+  solid?: boolean;
+}
+const { solid = false } = Astro.props;
+const path = Astro.url.pathname.replace(/\.html$/, "").replace(/\/$/, "") || "/";
+const links = [
+  { href: "/shop", label: "Collection" },
+  { href: "/about", label: "Maison" },
+  { href: "/contact", label: "Contact" }
+];
+const current = (href: string) => (path === href || (href === "/shop" && path.startsWith("/perfumes")) ? "page" : undefined);
+---
+<header class:list={["masthead", { "is-solid": solid }]} data-masthead>
+  <div class="announce">
+    {offerIsLive() && <><span data-diwali-banner>Diwali Edition · Buy 2, the third is our gift</span><i data-diwali-banner></i></>}
+    <span>97.8% similar to the originals</span>
+    <i></i>
+    <span>{STORE.concentration}</span>
+    <i></i>
+    <span>Order on WhatsApp</span>
+  </div>
+  <div class="bar">
+    <nav class="nav" aria-label="Main">
+      {links.map((link) => <a href={link.href} aria-current={current(link.href)}>{link.label}</a>)}
+    </nav>
+    <button class="menu-button" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu-panel" data-menu-button><span></span><span></span></button>
+    <a class="wordmark" href="/" aria-label="VYBEIN home">VYBEIN<small>Extrait de parfum</small></a>
+    <div class="bar-end">
+      <a class="bag-link" href="/cart" aria-current={path === "/cart" ? "page" : undefined}><span class="bag-label">Bag</span><span class="bag-count" data-cart-count aria-label="0 items in bag">0</span></a>
+    </div>
+  </div>
+</header>
+<div class="menu-panel" id="menu-panel" data-menu-panel>
+  <a href="/"><span>i.</span>Home</a>
+  <a href="/shop"><span>ii.</span>Collection</a>
+  <a href="/about"><span>iii.</span>Maison</a>
+  <a href="/contact"><span>iv.</span>Contact</a>
+  <a href="/cart"><span>v.</span>Your bag</a>
+  <p class="menu-meta">{STORE.whatsappDisplay} · WhatsApp</p>
+</div>

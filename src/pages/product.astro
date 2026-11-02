@@ -1,0 +1,21 @@
+---
+// Links shared before the redesign look like product.html?id=3. Send them to the new perfume page.
+import { PRODUCTS } from "../data/products";
+
+const routes = JSON.stringify(Object.fromEntries(PRODUCTS.map((product) => [product.id, `/perfumes/${product.slug}`])));
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>VYBEIN</title>
+    <noscript><meta http-equiv="refresh" content="0; url=/shop" /></noscript>
+    <script is:inline define:vars={{ routes }}>
+      const id = new URLSearchParams(location.search).get("id");
+      location.replace(JSON.parse(routes)[id] || "/shop");
+    </script>
+  </head>
+  <body style="background:#0c0a08"></body>
+</html>

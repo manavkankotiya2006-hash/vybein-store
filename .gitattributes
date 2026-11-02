@@ -1,0 +1,5 @@
+# Keep every text file on LF line endings, whatever the editor's platform.
+* text=auto eol=lf
+*.webp binary
+*.png binary
+*.avif binary

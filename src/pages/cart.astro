@@ -1,0 +1,267 @@
+---
+import { getImage } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import Arrow from "../components/Arrow.astro";
+import Muse from "../components/Muse.astro";
+import { PRODUCTS, STORE } from "../data/products";
+import { productPhoto } from "../data/images";
+
+// Small thumbnails for bag lines, which are drawn in the browser.
+const thumbs = Object.fromEntries(await Promise.all(PRODUCTS.map(async (product) => {
+  const image = await getImage({ src: productPhoto(product.code), format: "webp", width: 240 });
+  return [product.id, image.src];
+})));
+---
+<Base title="Your Bag — VYBEIN" description="Review your VYBEIN extraits and send your order to us on WhatsApp." solidHeader>
+  <section class="bag on-ivory">
+    <div class="container">
+      <header class="bag-head">
+        <span class="roman">Your selection</span>
+        <h1 class="title">Your <em>bag.</em></h1>
+      </header>
+
+      <div class="bag-layout">
+        <section class="lines" aria-labelledby="lines-title">
+          <div class="lines-head"><h2 id="lines-title">In your bag</h2><span data-line-count>0 items</span></div>
+          <div data-lines aria-live="polite"></div>
+          <a class="link back" href="/shop">Continue exploring <Arrow /></a>
+          <div class="bag-muse"><Muse label="Before you go" /></div>
+        </section>
+
+        <aside class="summary" data-summary-panel>
+          <p class="eyebrow">Order summary</p>
+          <div class="summary-rows" data-summary></div>
+          <form class="checkout" data-checkout novalidate>
+            <h3>Delivery details</h3>
+            <div class="field"><label for="name">Full name</label><input id="name" name="name" autocomplete="name" required /></div>
+            <div class="field"><label for="phone">Mobile number</label><input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="10-digit number" required /><small>10 digits; +91 is removed automatically.</small></div>
+            <div class="field"><label for="address">Delivery address</label><textarea id="address" name="address" rows="3" autocomplete="street-address" placeholder="House, street, area, city and state" required></textarea></div>
+            <div class="field"><label for="pincode">PIN code</label><input id="pincode" name="pincode" inputmode="numeric" autocomplete="postal-code" maxlength="6" placeholder="6-digit PIN" required /></div>
+            <p class="form-error" data-form-error role="alert"></p>
+            <button class="btn btn-ink" type="submit">Continue on WhatsApp <Arrow /></button>
+            <p class="fine">Your order opens in WhatsApp. We confirm availability and delivery there{STORE.upiId ? ` and you pay by UPI to ${STORE.upiId}` : ", and share our UPI QR code for payment"}. Nothing is charged on this website.</p>
+          </form>
+        </aside>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script type="application/json" id="bag-thumbs" set:html={JSON.stringify(thumbs)}></script>
+
+<script>
+  import { STORE, productUrl } from "../data/products";
+  import { formatPrice, priceLines, totals } from "../lib/pricing";
+  import { CART_EVENT, getCart, removeFromCart, setQuantity } from "../scripts/cart";
+  import { observeReveals, showToast } from "../scripts/site";
+
+  const thumbs: Record<string, string> = JSON.parse(document.getElementById("bag-thumbs")?.textContent || "{}");
+  const linesTarget = document.querySelector<HTMLElement>("[data-lines]")!;
+  const summary = document.querySelector<HTMLElement>("[data-summary]")!;
+  const count = document.querySelector<HTMLElement>("[data-line-count]");
+  const form = document.querySelector<HTMLFormElement>("[data-checkout]")!;
+  const errorBox = document.querySelector<HTMLElement>("[data-form-error]")!;
+
+  const escape = (value: string) => value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]!);
+  const plural = (amount: number, word: string) => `${amount} ${word}${amount === 1 ? "" : "s"}`;
+
+  function render() {
+    const lines = priceLines(getCart());
+    const { offer, itemQuantity, itemSubtotal, total, savings } = totals(lines);
+    if (count) count.textContent = plural(itemQuantity, "item");
+    form.hidden = !lines.length;
+
+    if (!lines.length) {
+      linesTarget.innerHTML = `<div class="empty"><span class="empty-mark">V</span><h3>Your bag awaits.</h3><p>Find the extrait that feels like you.</p><a class="btn btn-ink" href="/shop">Discover the collection</a></div>`;
+      summary.innerHTML = `<p class="row"><span>Subtotal</span><strong>${formatPrice(0)}</strong></p>`;
+      return;
+    }
+
+    linesTarget.innerHTML = lines.map(({ id, quantity, product }) => {
+      const free = offer.freeByProduct.get(id) || 0;
+      const paid = quantity - free;
+      const name = escape(product.code);
+      return `
+        <article class="line" data-reveal>
+          <a class="line-image arch" href="${productUrl(product)}"><img src="${thumbs[id] || ""}" alt="" width="240" height="240" loading="lazy" /></a>
+          <div class="line-copy">
+            <h3><a href="${productUrl(product)}">${name}</a></h3>
+            <p>Inspired by ${escape(product.inspiredBy)} · ${escape(product.volume)}</p>
+            <div class="line-controls">
+              <div class="stepper" role="group" aria-label="Quantity of ${name}">
+                <button type="button" data-step="-1" data-id="${id}" aria-label="One fewer ${name}" ${quantity <= 1 ? "disabled" : ""}>−</button>
+                <span>${quantity}</span>
+                <button type="button" data-step="1" data-id="${id}" aria-label="One more ${name}">+</button>
+              </div>
+              <button class="remove" type="button" data-remove="${id}">Remove</button>
+            </div>
+          </div>
+          <div class="line-price">
+            ${paid ? `<span class="price">${formatPrice(paid * product.price)}</span>` : ""}
+            ${free ? `<span class="gift">${free} × Diwali gift</span>` : ""}
+          </div>
+        </article>`;
+    }).join("");
+    observeReveals(linesTarget);
+
+    const offerRow = offer.active
+      ? offer.freeQuantity
+        ? `<p class="row gift-row"><span>Diwali gift · ${plural(offer.freeQuantity, "bottle")}</span><strong>−${formatPrice(offer.discountAmount)}</strong></p>`
+        : `<p class="hint">Add ${plural(offer.itemsToNextFree, "more extrait")} and the next one is our Diwali gift.</p>`
+      : "";
+    summary.innerHTML = `
+      <p class="row"><span>Items (${itemQuantity})</span><strong>${formatPrice(itemSubtotal)}</strong></p>
+      ${offerRow}
+      <p class="row muted"><span>You save</span><strong>${formatPrice(savings)}</strong></p>
+      <p class="row muted"><span>Delivery</span><strong>Confirmed on WhatsApp</strong></p>
+      <p class="row total"><span>Total</span><strong>${formatPrice(total)}</strong></p>`;
+  }
+
+  linesTarget.addEventListener("click", (event) => {
+    const target = event.target as Element;
+    const step = target.closest<HTMLButtonElement>("[data-step]");
+    if (step) {
+      const line = getCart().find((item) => item.id === step.dataset.id);
+      if (line) setQuantity(line.id, line.quantity + Number(step.dataset.step));
+      return;
+    }
+    const remove = target.closest<HTMLButtonElement>("[data-remove]");
+    if (remove) removeFromCart(remove.dataset.remove!);
+  });
+
+  // Digits only; a pasted +91 or leading 0 is dropped.
+  const phone = form.elements.namedItem("phone") as HTMLInputElement;
+  const pincode = form.elements.namedItem("pincode") as HTMLInputElement;
+  const mobileDigits = (value: string) => {
+    let digits = value.replace(/\D/g, "");
+    if (digits.length > 10 && digits.startsWith("91")) digits = digits.slice(2);
+    if (digits.length > 10 && digits.startsWith("0")) digits = digits.slice(1);
+    return digits.slice(0, 10);
+  };
+  phone.addEventListener("input", () => { phone.value = mobileDigits(phone.value); });
+  pincode.addEventListener("input", () => { pincode.value = pincode.value.replace(/\D/g, "").slice(0, 6); });
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const value = (key: string) => String(data.get(key) || "").trim();
+    const problems = [
+      [!value("name"), "name", "Please add your name."],
+      [mobileDigits(value("phone")).length !== 10, "phone", "Please enter a 10-digit mobile number."],
+      [!value("address"), "address", "Please add your delivery address."],
+      [!/^\d{6}$/.test(value("pincode")), "pincode", "Please enter your 6-digit PIN code."]
+    ] as const;
+    const problem = problems.find(([failed]) => failed);
+    if (problem) {
+      errorBox.textContent = problem[2];
+      (form.elements.namedItem(problem[1]) as HTMLElement).focus();
+      return;
+    }
+    errorBox.textContent = "";
+
+    const lines = priceLines(getCart());
+    if (!lines.length) return showToast("Your bag is empty.");
+    const { offer, total } = totals(lines);
+    // Word for word the message the old site sent, so orders read the same in WhatsApp.
+    const orderLines = lines.map(({ id, quantity, product }) => {
+      const free = offer.freeByProduct.get(id) || 0;
+      const paid = quantity - free;
+      const detail = free ? ` (${paid ? `${paid} paid, ` : ""}${free} FREE)` : "";
+      return `• ${product.code} × ${quantity}${detail} — ${paid ? formatPrice(paid * product.price) : "FREE · Diwali offer"}`;
+    }).join("\n");
+    const plural = offer.itemsToNextFree === 1 ? "" : "s";
+    const promotion = offer.active
+      ? offer.freeQuantity
+        ? [
+          `Diwali offer applied: Buy ${offer.buyQuantity}, get 1 FREE.`,
+          `Free perfume(s): ${offer.freeItems.map((item) => `${item.product.code} × ${item.quantity}`).join(", ")}.`,
+          `Diwali discount: −${formatPrice(offer.discountAmount)}.`
+        ]
+        : [`Diwali offer: Buy ${offer.buyQuantity}, get 1 free. Add ${offer.itemsToNextFree} more perfume${plural} to unlock it.`]
+      : [];
+    const message = [
+      "Hi VYBEIN, I’d like to place this order:",
+      "",
+      orderLines,
+      "",
+      ...promotion,
+      ...(promotion.length ? [""] : []),
+      `Order total: ${formatPrice(total)}`,
+      "",
+      `Name: ${value("name")}`,
+      `Phone: ${mobileDigits(value("phone"))}`,
+      `Delivery address: ${value("address")}`,
+      `PIN code: ${value("pincode")}`,
+      "",
+      "Please confirm delivery details and share your UPI QR code for payment."
+    ].join("\n");
+    const url = `https://wa.me/${STORE.whatsappNumber}?text=${encodeURIComponent(message)}`;
+    const tab = window.open(url, "_blank");
+    if (tab) tab.opener = null;
+    else window.location.assign(url);
+  });
+
+  window.addEventListener(CART_EVENT, render);
+  window.addEventListener("pageshow", (event) => { if (event.persisted) render(); });
+  render();
+</script>
+
+<style>
+  .bag { min-height: 100vh; padding: calc(var(--header) + 34px + clamp(48px, 6vw, 88px)) 0 clamp(88px, 10vw, 140px); }
+  .bag-head { display: grid; gap: 10px; margin-bottom: clamp(40px, 5vw, 64px); }
+  .bag-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(320px, .9fr); gap: clamp(40px, 6vw, 96px); align-items: start; }
+  .lines-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 18px; border-bottom: 1px solid var(--line-light); }
+  .lines-head h2 { font-size: 1.6rem; }
+  .lines-head span { color: var(--muted-light); font-family: var(--serif); font-style: italic; font-size: 1.1rem; }
+  .back { margin-top: 32px; }
+  .bag-muse { max-width: 34rem; margin-top: 56px; padding-top: 26px; border-top: 1px solid var(--line-light); }
+
+  .summary { position: sticky; top: calc(var(--header) + 24px); display: grid; gap: 22px; padding: clamp(28px, 3.5vw, 44px); background: var(--parchment); border: 1px solid rgba(143, 110, 53, .22); }
+  /* Room is reserved for content drawn by script, so the page does not jump. */
+  .summary-rows { display: grid; gap: 0; min-height: 236px; }
+  [data-lines] { min-height: 300px; }
+  .checkout { display: grid; gap: 22px; margin-top: 8px; padding-top: 28px; border-top: 1px solid var(--line-light); }
+  .checkout[hidden] { display: none; }
+  .checkout h3 { font-size: 1.6rem; }
+  .form-error { min-height: 1em; color: var(--burgundy); font-size: 13px; }
+  .form-error:empty { display: none; }
+  .fine { color: var(--muted-light); font-size: 12.5px; line-height: 1.6; }
+
+  /* Lines are drawn by script, so their styles must be global. */
+  :global(.line) { display: grid; grid-template-columns: 104px 1fr auto; gap: 24px; align-items: center; padding: 26px 0; border-bottom: 1px solid var(--line-light); }
+  :global(.line-image) { width: 104px; aspect-ratio: 4 / 5; background: #efe6d6; }
+  :global(.line-image img) { width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); }
+  :global(.line-copy h3) { font-size: 1.8rem; font-weight: 500; letter-spacing: .08em; }
+  :global(.line-copy p) { color: var(--muted-light); font-size: 13px; }
+  :global(.line-controls) { display: flex; align-items: center; gap: 22px; margin-top: 14px; }
+  :global(.stepper) { display: inline-flex; align-items: center; border: 1px solid var(--line-light); }
+  :global(.stepper button) { width: 38px; height: 38px; border: 0; background: none; font-size: 16px; }
+  :global(.stepper button:disabled) { opacity: .3; cursor: default; }
+  :global(.stepper span) { min-width: 28px; text-align: center; font-family: var(--serif); font-size: 1.1rem; }
+  :global(.remove) { padding: 0 0 3px; border: 0; background: linear-gradient(currentColor, currentColor) left bottom / 100% 1px no-repeat; color: var(--muted-light); font-size: 9.5px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; }
+  :global(.line-price) { display: grid; justify-items: end; gap: 6px; }
+  :global(.gift) { padding: 5px 10px; background: var(--burgundy); color: var(--ivory); font-size: 9px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
+  :global(.row) { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line-light); font-size: 14px; }
+  :global(.row strong) { font-family: var(--serif); font-size: 1.15rem; font-weight: 500; }
+  :global(.row.muted) { color: var(--muted-light); }
+  :global(.row.muted strong) { font-family: var(--sans); font-size: 13px; font-weight: 500; }
+  :global(.gift-row) { color: var(--burgundy); }
+  :global(.row.total) { padding-top: 18px; border-bottom: 0; font-size: 11px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; }
+  :global(.row.total strong) { font-size: 1.9rem; letter-spacing: 0; text-transform: none; }
+  :global(.hint) { padding: 12px 0; border-bottom: 1px solid var(--line-light); color: var(--burgundy); font-family: var(--serif); font-style: italic; font-size: 1.1rem; }
+  :global(.empty) { display: grid; justify-items: center; gap: 14px; padding: 72px 0; text-align: center; }
+  :global(.empty-mark) { font-family: var(--serif); font-size: 5rem; font-weight: 300; line-height: 1; color: transparent; -webkit-text-stroke: 1px var(--gold-deep); }
+  :global(.empty h3) { font-size: 2.2rem; }
+  :global(.empty p) { margin-bottom: 10px; color: var(--muted-light); }
+
+  @media (max-width: 960px) {
+    .bag-layout { grid-template-columns: 1fr; }
+    .summary { position: static; }
+  }
+  @media (max-width: 560px) {
+    :global(.line) { grid-template-columns: 76px 1fr; gap: 16px; }
+    :global(.line-image) { width: 76px; }
+    :global(.line-price) { grid-column: 2; justify-items: start; }
+    :global(.line-copy h3) { font-size: 1.5rem; }
+  }
+</style>

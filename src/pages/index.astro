@@ -1,0 +1,448 @@
+---
+import { Picture } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import ProductCard from "../components/ProductCard.astro";
+import Arrow from "../components/Arrow.astro";
+import Muse from "../components/Muse.astro";
+import { MOODS, PRODUCTS, STORE, productUrl } from "../data/products";
+import { heroPhoto, productPhoto } from "../data/images";
+import { formatPrice, offerIsLive } from "../lib/pricing";
+import aboutImage from "../assets/about-perfume-lab.png";
+
+const first = PRODUCTS[0];
+const chapterMarks = ["Overture", "I", "II", "III", "Collection"];
+const ritual = [
+  {
+    title: "The anatomy",
+    intro: "Every extrait unfolds in three movements.",
+    items: [
+      ["Top", "The first impression — bright notes you meet first."],
+      ["Heart", "The character — the notes that unfold next."],
+      ["Base", "The lasting trail — deep notes that linger on skin."]
+    ]
+  },
+  {
+    title: "The ritual",
+    intro: "Mist lightly on warm pulse points. Never rub.",
+    items: [
+      ["i.", "The neck, and just behind the ears"],
+      ["ii.", "The inner wrists"],
+      ["iii.", "The inner elbows"],
+      ["iv.", "Along the collarbone"]
+    ]
+  },
+  {
+    title: "The long wear",
+    intro: "Small habits keep a signature with you all day.",
+    items: [
+      ["i.", "Begin on moisturised skin, after a shower or an unscented balm."],
+      ["ii.", "Let it settle and dry naturally on the skin."],
+      ["iii.", "Store the bottle somewhere cool, away from sun and humidity."],
+      ["iv.", "Refresh with a single light mist rather than several."]
+    ]
+  }
+];
+---
+<Base
+  title="VYBEIN — Extrait de Parfum | Presence, bottled"
+  description={`Eight unisex extraits de parfum with ${STORE.concentration}. Now ${formatPrice(STORE.price)}, reduced from ${formatPrice(STORE.originalPrice)}. Order on WhatsApp.`}
+>
+  <!-- ============ Overture: the scroll-driven 3D bottle ============ -->
+  <section class="overture" data-overture aria-label="Introducing VYBEIN">
+    <div class="overture-stage">
+      <canvas class="overture-canvas" data-overture-canvas aria-hidden="true"></canvas>
+      <div class="overture-fallback arch arch-lined">
+        <Picture src={heroPhoto()} formats={["avif"]} fallbackFormat="webp" widths={[480, 760]} sizes="(max-width: 900px) 70vw, 36vw" alt={`VYBEIN ${first.code} extrait de parfum with cinnamon and cardamom`} loading="eager" />
+      </div>
+      <div class="overture-vignette" aria-hidden="true"></div>
+
+      <div class="panel panel-left" data-panel="0">
+        <div class="panel-inner hero-copy">
+          <p class="eyebrow">Maison VYBEIN · Extrait de parfum</p>
+          <h1 class="display">Presence,<br /><em>bottled.</em></h1>
+          <p class="lede">Eight extraits with {STORE.concentration}, composed for those who are remembered long after they leave the room.</p>
+          <div class="hero-actions">
+            <a class="btn btn-gold" href="/shop">Discover the collection <Arrow /></a>
+            <span class="hero-price">Each <strong>{formatPrice(STORE.price)}</strong><del>{formatPrice(STORE.originalPrice)}</del></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-left" data-panel="1">
+        <div class="panel-inner">
+          <span class="roman">I.</span>
+          <p class="eyebrow">The opening</p>
+          <h2 class="title">The first<br /><em>impression.</em></h2>
+          <p class="lede">Top notes arrive first — bright, luminous and fleeting. They announce you before you say a word.</p>
+        </div>
+      </div>
+      <div class="panel panel-right" data-panel="2">
+        <div class="panel-inner">
+          <span class="roman">II.</span>
+          <p class="eyebrow">The heart</p>
+          <h2 class="title">Where character<br /><em>lives.</em></h2>
+          <p class="lede">As the opening softens, the heart unfolds — the true personality of the composition, revealed slowly over hours.</p>
+        </div>
+      </div>
+      <div class="panel panel-left" data-panel="3">
+        <div class="panel-inner">
+          <span class="roman">III.</span>
+          <p class="eyebrow">The trail</p>
+          <h2 class="title">What remains<br /><em>of you.</em></h2>
+          <p class="lede">Deep base notes settle into the skin and linger long after you have gone. This is what people remember.</p>
+        </div>
+      </div>
+      <div class="panel panel-split" data-panel="4">
+        <div class="panel-inner split-title">
+          <p class="eyebrow">The collection</p>
+          <h2 class="title">Eight <br /><em>signatures.</em></h2>
+        </div>
+        <div class="panel-inner split-cycle">
+          <span class="cycle-no" data-cycle-no>No. 01</span>
+          <a class="cycle-name" data-cycle-name href={productUrl(first)}>{first.code}</a>
+          <span class="cycle-inspired" data-cycle-inspired>Inspired by {first.inspiredBy}</span>
+          <ol class="cycle-dots" aria-hidden="true">{PRODUCTS.map((_, index) => <li data-cycle-dot class:list={{ "is-active": index === 0 }} />)}</ol>
+          <a class="link" href="/shop">Explore all eight <Arrow /></a>
+        </div>
+      </div>
+
+      <ol class="chapter-index" aria-hidden="true">
+        {chapterMarks.map((mark, index) => <li data-chapter-mark class:list={{ "is-active": index === 0 }}>{mark}</li>)}
+      </ol>
+      <div class="overture-progress" aria-hidden="true"><span data-overture-progress></span></div>
+      <div class="scroll-cue" data-scroll-cue aria-hidden="true"><span>Scroll</span><i></i></div>
+      <p class="drag-hint" data-drag-hint aria-hidden="true"><svg viewBox="0 0 40 12"><path d="M1 6h38M5 2 1 6l4 4M35 2l4 4-4 4" /></svg>Drag to turn</p>
+    </div>
+  </section>
+
+  <!-- ============ The craft in numbers ============ -->
+  <section class="craft on-ivory" aria-label="The craft">
+    <div class="container craft-grid">
+      <div data-reveal><strong>30<sup>%</sup></strong><span>Oil concentration</span></div>
+      <div data-reveal style="--delay:.1s"><strong>50<sup>ml</sup></strong><span>Extrait de parfum</span></div>
+      <div data-reveal style="--delay:.2s"><strong>97.8<sup>%</sup></strong><span>Similar to the original</span></div>
+      <div data-reveal style="--delay:.3s"><strong>08</strong><span>Signatures, all unisex</span></div>
+    </div>
+  </section>
+
+  <!-- ============ The collection ============ -->
+  <section class="section on-ivory collection" id="collection">
+    <div class="container">
+      <div class="heading">
+        <span class="roman" data-reveal>The collection</span>
+        <h2 class="title" data-reveal="rise">Choose by <em>feeling.</em></h2>
+        <span class="ornament" data-reveal><i></i></span>
+        <p class="lede" data-reveal>Each extrait is composed after an icon of modern perfumery, and made for anyone who loves the way it feels.</p>
+      </div>
+      <div class="collection-grid">
+        {PRODUCTS.map((product, index) => <ProductCard product={product} delay={(index % 4) * 0.08} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Rotating perfume wisdom ============ -->
+  <section class="muse-section on-noir" data-reveal="fade">
+    <div class="container"><Muse variant="band" /></div>
+  </section>
+
+  <!-- ============ Diwali edition ============ -->
+  {offerIsLive() && (
+    <section class="festive on-burgundy" data-diwali-banner aria-labelledby="festive-title">
+      <div class="container festive-inner">
+        <svg class="festive-diya" viewBox="0 0 80 72" aria-hidden="true"><path class="flame" d="M40 5c2 9 12 14 7 24-3 6-12 6-15 0-4-8 5-15 8-24Z" /><path d="M12 39c5 13 15 22 28 22s23-9 28-22c-10 6-19 8-28 8s-18-2-28-8Z" /><path d="M22 44h36M30 67h20" /></svg>
+        <p class="eyebrow" data-reveal>The Diwali Edition</p>
+        <h2 class="title" id="festive-title" data-reveal="rise">Choose two.<br /><em>The third is our gift.</em></h2>
+        <p class="lede" data-reveal>Place any three extraits in your bag and the third is on us — applied automatically, for every three you choose.</p>
+        <a class="btn btn-ghost" href="/shop" data-reveal>Compose your trio <Arrow /></a>
+      </div>
+    </section>
+  )}
+
+  <!-- ============ Find your signature ============ -->
+  <section class="section on-parchment finder" aria-labelledby="finder-title">
+    <div class="container finder-inner">
+      <div class="finder-intro">
+        <span class="roman" data-reveal>A private consultation</span>
+        <h2 class="title" id="finder-title" data-reveal="rise">Find your<br /><em>signature.</em></h2>
+        <p class="lede" data-reveal>Choose the feeling you want to leave behind. We will introduce you to the extraits that carry it.</p>
+        <div class="finder-moods" role="tablist" aria-label="Fragrance moods" data-reveal>
+          {MOODS.map((mood, index) => (
+            <button type="button" role="tab" id={`mood-tab-${mood.key}`} aria-controls={`mood-${mood.key}`} aria-selected={index === 0 ? "true" : "false"} tabindex={index === 0 ? 0 : -1} data-mood-tab={mood.key}>
+              <span>{mood.label}</span><small>{mood.hint}</small>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div class="finder-results">
+        {MOODS.map((mood, index) => (
+          <div class="finder-panel" role="tabpanel" id={`mood-${mood.key}`} aria-labelledby={`mood-tab-${mood.key}`} hidden={index !== 0} data-mood-panel={mood.key}>
+            {PRODUCTS.filter((product) => product.moods.includes(mood.key)).map((product) => (
+              <a class="finder-match" href={productUrl(product)}>
+                <span class="finder-thumb arch"><Picture src={productPhoto(product.code)} formats={["avif"]} fallbackFormat="webp" widths={[160, 240]} sizes="96px" alt="" loading="lazy" /></span>
+                <span class="finder-copy"><strong>{product.code}</strong><span>Inspired by {product.inspiredBy}</span><em>{product.mood}</em></span>
+                <span class="finder-price">{formatPrice(product.price)}<Arrow /></span>
+              </a>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ The ritual ============ -->
+  <section class="section on-noir ritual" aria-labelledby="ritual-title">
+    <div class="container">
+      <div class="heading">
+        <span class="roman" data-reveal>Scent school</span>
+        <h2 class="title" id="ritual-title" data-reveal="rise">Wear it with <em>intention.</em></h2>
+        <span class="ornament" data-reveal><i></i></span>
+      </div>
+      <div class="ritual-grid">
+        {ritual.map((block, index) => (
+          <article class="ritual-card" data-reveal style={`--delay:${index * 0.12}s`}>
+            <span class="ritual-index">{["I", "II", "III"][index]}</span>
+            <h3>{block.title}</h3>
+            <p class="ritual-intro">{block.intro}</p>
+            <ol>
+              {block.items.map(([mark, text]) => <li><span>{mark}</span>{text}</li>)}
+            </ol>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ The maison ============ -->
+  <section class="section on-ivory maison" aria-labelledby="maison-title">
+    <div class="container maison-inner">
+      <div class="maison-art arch arch-lined" data-reveal="arch">
+        <Picture src={aboutImage} formats={["avif"]} fallbackFormat="webp" widths={[480, 760, 1100]} sizes="(max-width: 900px) 90vw, 44vw" alt="A perfumer adding amber essence to a VYBEIN bottle at a workbench" loading="lazy" />
+      </div>
+      <div class="maison-copy">
+        <span class="roman" data-reveal>The maison</span>
+        <h2 class="title" id="maison-title" data-reveal="rise">Scent has no gender.<br /><em>Only a point of view.</em></h2>
+        <p class="lede" data-reveal>VYBEIN creates inspired recreations of iconic perfume profiles, each composed to feel 97.8% similar to its inspiration — a familiar character, made personal, for {formatPrice(STORE.price)}.</p>
+        <a class="link" href="/about" data-reveal>Our story <Arrow /></a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  // The 3D overture is its own chunk, fetched once the page has loaded so it
+  // never competes with text, fonts and photos on a slow connection.
+  const loadOverture = () => import("../scripts/overture");
+  if (document.readyState === "complete") loadOverture();
+  else window.addEventListener("load", loadOverture, { once: true });
+
+  // Mood finder tabs.
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>("[data-mood-tab]")];
+  function selectMood(tab: HTMLButtonElement) {
+    tabs.forEach((item) => {
+      const selected = item === tab;
+      item.setAttribute("aria-selected", String(selected));
+      item.tabIndex = selected ? 0 : -1;
+      const panel = document.getElementById(item.getAttribute("aria-controls") || "");
+      if (panel) panel.hidden = !selected;
+    });
+  }
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectMood(tab));
+    tab.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+      const next = tabs[(index + (event.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+      selectMood(next);
+      next.focus();
+    });
+  });
+</script>
+
+<style>
+  /* ---------- Overture ---------- */
+  .overture { position: relative; height: 760vh; background: var(--noir); }
+  .overture.is-static { height: auto; }
+  .overture-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+    background: radial-gradient(circle at 68% 52%, #2a1e13 0%, var(--noir) 42%);
+  }
+  .is-static .overture-stage { position: relative; }
+  .overture-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1.8s var(--ease); cursor: grab; touch-action: pan-y; }
+  .is-grabbing .overture-canvas { cursor: grabbing; }
+  .drag-hint { position: absolute; left: 71%; bottom: 10vh; z-index: 2; display: flex; align-items: center; gap: 12px; color: var(--muted-dark); font-family: var(--serif); font-style: italic; font-size: 15px; pointer-events: none; transform: translateX(-50%); transition: opacity .8s var(--ease); }
+  .drag-hint svg { width: 34px; fill: none; stroke: var(--gold); stroke-width: 1; animation: nudge 2.6s var(--ease) infinite; }
+  @keyframes nudge { 50% { transform: translateX(5px); } }
+  .drag-hint.is-done { opacity: 0 !important; }
+  .is-static .drag-hint, .no-webgl .drag-hint { display: none; }
+  .is-ready .overture-canvas { opacity: 1; }
+  .overture-fallback { display: none; position: absolute; top: 50%; right: 8vw; width: min(34vw, 460px); aspect-ratio: 4 / 5; transform: translateY(-46%); }
+  .overture-fallback img { width: 100%; height: 100%; object-fit: cover; }
+  .no-webgl .overture-fallback, :global(html:not(.js)) .overture-fallback { display: block; }
+  .no-webgl .overture-canvas { display: none; }
+  .overture-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(12, 10, 8, .75) 0%, transparent 22%, transparent 78%, rgba(12, 10, 8, .9) 100%),
+      radial-gradient(ellipse at 50% 50%, transparent 52%, rgba(0, 0, 0, .5) 100%);
+  }
+
+  .panel {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    padding: calc(var(--header) + 34px) var(--gutter) 40px;
+    pointer-events: none;
+  }
+  .panel-inner { display: grid; justify-items: start; gap: 22px; max-width: 34rem; pointer-events: auto; }
+  .panel-right { justify-content: flex-end; }
+  .panel-split { justify-content: space-between; }
+  /* Keep right-hand copy clear of the chapter index. */
+  .panel-right, .panel-split { padding-right: calc(var(--gutter) + 120px); }
+  :global(.js) .overture:not(.is-static) .panel:not([data-panel="0"]) { opacity: 0; visibility: hidden; }
+  .is-static .panel:not([data-panel="0"]), :global(html:not(.js)) .panel:not([data-panel="0"]) { display: none; }
+  .hero-copy { max-width: 38rem; }
+  .hero-copy .display { margin-block: 6px 4px; }
+  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 22px 30px; margin-top: 14px; }
+  .hero-price { color: var(--muted-dark); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+  .hero-price strong { margin-left: 6px; font-family: var(--serif); font-size: 1.5rem; font-weight: 500; letter-spacing: 0; color: var(--gold-soft); text-transform: none; }
+  .hero-price del { margin-left: 10px; letter-spacing: 0; text-transform: none; }
+
+  .split-title { max-width: 22rem; }
+  .split-cycle { justify-items: end; gap: 10px; text-align: right; max-width: 20rem; }
+  .cycle-no { font-family: var(--serif); font-style: italic; font-size: 1.1rem; color: var(--gold); }
+  .cycle-name { font-family: var(--serif); font-size: clamp(2.6rem, 4.4vw, 4rem); font-weight: 400; letter-spacing: .1em; line-height: 1; }
+  .cycle-inspired { color: var(--muted-dark); font-size: 13px; letter-spacing: .08em; }
+  .cycle-dots { display: flex; gap: 8px; margin: 14px 0 18px; padding: 0; list-style: none; }
+  .cycle-dots li { width: 6px; height: 6px; border: 1px solid var(--gold); transform: rotate(45deg); transition: background-color .4s var(--ease); }
+  .cycle-dots li.is-active { background: var(--gold); }
+
+  .chapter-index {
+    position: absolute;
+    right: var(--gutter);
+    top: 50%;
+    z-index: 3;
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    transform: translateY(-50%);
+    text-align: right;
+  }
+  .chapter-index li { font-family: var(--serif); font-style: italic; font-size: 13px; color: rgba(239, 231, 216, .28); transition: color .5s var(--ease); }
+  .chapter-index li.is-active { color: var(--gold-soft); }
+  .overture-progress { position: absolute; right: calc(var(--gutter) - 22px); top: 50%; z-index: 3; width: 1px; height: 150px; background: rgba(201, 164, 92, .18); transform: translateY(-50%); }
+  .overture-progress span { display: block; height: 100%; background: var(--gold); transform: scaleY(0); transform-origin: top; }
+  .is-static .chapter-index, .is-static .overture-progress { display: none; }
+
+  .scroll-cue { position: absolute; left: 50%; bottom: 28px; z-index: 3; display: grid; justify-items: center; gap: 10px; transform: translateX(-50%); color: var(--muted-dark); font-size: 9.5px; font-weight: 600; letter-spacing: .4em; text-transform: uppercase; }
+  .scroll-cue i { position: relative; width: 1px; height: 46px; overflow: hidden; background: rgba(201, 164, 92, .2); }
+  .scroll-cue i::after { content: ""; position: absolute; inset: 0; background: var(--gold); animation: cue 2.4s var(--ease) infinite; }
+  @keyframes cue { 0% { transform: translateY(-100%); } 60%, 100% { transform: translateY(100%); } }
+  .is-static .scroll-cue { display: none; }
+
+  @media (max-width: 900px), (orientation: portrait) {
+    .overture-stage { background: radial-gradient(circle at 50% 30%, #2a1e13 0%, var(--noir) 50%); }
+    .panel, .panel-right, .panel-split { align-items: flex-end; justify-content: center; padding-right: var(--gutter); padding-bottom: max(56px, 9vh); text-align: center; }
+    .panel-inner, .split-cycle { justify-items: center; max-width: 30rem; gap: 14px; text-align: center; }
+    .panel-split { flex-direction: column; justify-content: flex-end; gap: 6px; }
+    .split-title .title { font-size: 2.2rem; }
+    .split-title br { display: none; }
+    .cycle-dots { margin: 6px 0 8px; }
+    .hero-copy .display { font-size: clamp(3rem, 14vw, 4.6rem); }
+    .hero-copy .lede { font-size: 14px; line-height: 1.6; }
+    .hero-actions { gap: 14px 20px; margin-top: 4px; }
+    .hero-actions { justify-content: center; }
+    .panel .title { font-size: clamp(2.2rem, 9vw, 3rem); }
+    .panel .lede { font-size: 14.5px; }
+    .chapter-index, .overture-progress { display: none; }
+    .scroll-cue { display: none; }
+    .drag-hint { left: 50%; top: 47%; bottom: auto; font-size: 13px; }
+    .overture-fallback { top: 14%; right: 50%; width: min(62vw, 300px); transform: translateX(50%); }
+  }
+
+  @media (max-width: 900px) and (max-height: 740px) {
+    .panel .lede { display: none; }
+  }
+
+  /* ---------- Craft ---------- */
+  .craft { padding-block: clamp(56px, 7vw, 92px); border-bottom: 1px solid var(--line-light); }
+  .craft-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .craft-grid div { display: grid; justify-items: center; gap: 10px; padding: 8px 12px; text-align: center; }
+  .craft-grid div + div { border-left: 1px solid rgba(143, 110, 53, .28); }
+  .craft-grid strong { font-family: var(--serif); font-size: clamp(2.6rem, 5vw, 4.2rem); font-weight: 300; line-height: 1; color: var(--ink); }
+  .craft-grid sup { margin-left: 2px; font-size: .38em; font-style: italic; color: var(--gold-deep); vertical-align: super; }
+  .craft-grid span { color: var(--muted-light); font-size: 10px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; }
+  @media (max-width: 760px) {
+    .craft-grid { grid-template-columns: repeat(2, 1fr); row-gap: 36px; }
+    .craft-grid div:nth-child(3) { border-left: 0; }
+  }
+
+  .collection { padding-top: clamp(80px, 10vw, 140px); }
+  .muse-section { padding-block: clamp(80px, 10vw, 136px); background: radial-gradient(ellipse at 50% 100%, #1f150d 0%, var(--noir) 60%); }
+
+  /* ---------- Festive ---------- */
+  .festive { position: relative; overflow: hidden; padding-block: clamp(96px, 12vw, 160px); text-align: center; background: radial-gradient(ellipse at 50% 0%, #6a1a2c 0%, var(--burgundy) 30%, var(--burgundy-deep) 75%); }
+  .festive::before, .festive::after { content: ""; position: absolute; left: 50%; width: min(860px, 90vw); height: 1px; background: linear-gradient(90deg, transparent, rgba(201, 164, 92, .45), transparent); transform: translateX(-50%); }
+  .festive::before { top: 28px; }
+  .festive::after { bottom: 28px; }
+  .festive-inner { display: grid; justify-items: center; gap: 22px; }
+  .festive-diya { width: 64px; margin-bottom: 8px; fill: none; stroke: var(--gold); stroke-width: 1.4; }
+  .festive-diya .flame { fill: rgba(228, 203, 148, .25); transform-origin: 40px 30px; animation: flicker 3.2s ease-in-out infinite; }
+  @keyframes flicker { 50% { transform: scale(1.06, .94) rotate(-2deg); opacity: .8; } }
+  .festive .lede { text-align: center; }
+
+  /* ---------- Finder ---------- */
+  .finder-inner { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(48px, 7vw, 110px); align-items: start; }
+  .finder-intro { display: grid; justify-items: start; gap: 22px; }
+  .finder-moods { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; width: 100%; margin-top: 12px; background: var(--line-light); border: 1px solid var(--line-light); }
+  .finder-moods button { display: grid; gap: 4px; padding: 20px 22px; border: 0; background: var(--parchment); text-align: left; transition: background-color .5s var(--ease), color .5s var(--ease); }
+  .finder-moods button span { font-family: var(--serif); font-size: 1.6rem; line-height: 1.1; }
+  .finder-moods button small { color: var(--muted-light); font-size: 12px; }
+  .finder-moods button:hover { background: #e7dcc8; }
+  .finder-moods button[aria-selected="true"] { background: var(--burgundy); color: var(--ivory); }
+  .finder-moods button[aria-selected="true"] small { color: var(--gold-soft); }
+  .finder-results { padding-top: 8px; }
+  .finder-panel { display: grid; gap: 0; border-top: 1px solid var(--line-light); animation: panelIn .8s var(--ease-out); }
+  @keyframes panelIn { from { opacity: 0; transform: translateY(14px); } }
+  .finder-match { display: grid; grid-template-columns: 96px 1fr auto; gap: 26px; align-items: center; padding: 22px 0; border-bottom: 1px solid var(--line-light); transition: padding .5s var(--ease); }
+  .finder-match:hover { padding-left: 10px; }
+  .finder-thumb { width: 96px; aspect-ratio: 4 / 5; background: #efe6d6; }
+  .finder-thumb img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); }
+  .finder-copy { display: grid; gap: 2px; }
+  .finder-copy strong { font-family: var(--serif); font-size: 1.7rem; font-weight: 500; letter-spacing: .08em; }
+  .finder-copy span { color: var(--muted-light); font-size: 13px; }
+  .finder-copy em { margin-top: 6px; font-family: var(--serif); font-size: 1.1rem; color: var(--gold-deep); }
+  .finder-price { display: flex; align-items: center; gap: 14px; font-family: var(--serif); font-size: 1.25rem; }
+  @media (max-width: 900px) {
+    .finder-inner { grid-template-columns: 1fr; }
+    .finder-match { grid-template-columns: 72px 1fr; gap: 18px; }
+    .finder-thumb { width: 72px; }
+    .finder-price { grid-column: 2; }
+  }
+
+  /* ---------- Ritual ---------- */
+  .ritual-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(201, 164, 92, .16); border: 1px solid rgba(201, 164, 92, .16); }
+  .ritual-card { display: grid; align-content: start; gap: 14px; padding: clamp(32px, 4vw, 54px); background: var(--noir); }
+  .ritual-index { font-family: var(--serif); font-size: 3.4rem; font-weight: 300; line-height: 1; color: transparent; -webkit-text-stroke: 1px var(--gold); }
+  .ritual-card h3 { font-size: 2rem; }
+  .ritual-intro { color: var(--muted-dark); font-family: var(--serif); font-style: italic; font-size: 1.15rem; }
+  .ritual-card ol { display: grid; gap: 0; margin: 14px 0 0; padding: 0; list-style: none; }
+  .ritual-card li { display: grid; grid-template-columns: 56px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid rgba(201, 164, 92, .14); color: #cfc5b5; font-size: 14px; }
+  .ritual-card li span { color: var(--gold); font-family: var(--serif); font-style: italic; font-size: 1.05rem; text-transform: none; }
+  @media (max-width: 960px) { .ritual-grid { grid-template-columns: 1fr; } }
+
+  /* ---------- Maison ---------- */
+  .maison-inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(48px, 8vw, 128px); align-items: center; }
+  .maison-art { aspect-ratio: 4 / 5; background: var(--parchment); }
+  .maison-art img { width: 100%; height: 100%; object-fit: cover; }
+  .maison-copy { display: grid; justify-items: start; gap: 24px; }
+  @media (max-width: 900px) { .maison-inner { grid-template-columns: 1fr; } .maison-art { width: min(100%, 460px); margin-inline: auto; } }
+</style>

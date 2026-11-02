@@ -1,0 +1,89 @@
+---
+import Base from "../layouts/Base.astro";
+import Arrow from "../components/Arrow.astro";
+import { STORE, whatsappLink } from "../data/products";
+
+const options = [
+  { label: "The quickest way", title: "Message us on WhatsApp", detail: STORE.whatsappDisplay, href: whatsappLink("Hi VYBEIN, I need a little help."), external: true },
+  { label: "Prefer a call?", title: "Speak with us", detail: STORE.whatsappDisplay, href: `tel:+${STORE.whatsappNumber}`, external: false },
+  { label: "Follow the maison", title: "Instagram", detail: STORE.instagramHandle, href: STORE.instagram, external: true }
+];
+const faqs = [
+  ["How do orders work?", "Share your order through WhatsApp. We confirm the details and send our UPI QR code in the chat."],
+  ["Can you help me choose a fragrance?", "Of course. Tell us the notes or moods you enjoy, and we will suggest an extrait to explore."],
+  ["Where can I find delivery details?", "We confirm delivery availability and timing with you on WhatsApp when you place an order."]
+];
+---
+<Base title="Contact — VYBEIN" description="Questions about a scent or an order? Write to VYBEIN on WhatsApp, call us, or send a note.">
+  <section class="page-hero">
+    <div class="container">
+      <span class="roman" data-enter>At your service</span>
+      <h1 class="display" data-enter="rise" style="--delay:0.08s">We are one<br /><em>message away.</em></h1>
+      <p class="lede" data-enter style="--delay:0.16s">Need a hand finding your note, or a question about an order? Write to us — a person, not a bot, will reply.</p>
+    </div>
+  </section>
+
+  <section class="section on-ivory">
+    <div class="container contact-grid">
+      <div class="options">
+        {options.map((option, index) => (
+          <a class="option" href={option.href} target={option.external ? "_blank" : undefined} rel={option.external ? "noopener" : undefined} data-reveal style={`--delay:${index * 0.1}s`}>
+            <span class="option-index">{["I", "II", "III"][index]}</span>
+            <span class="option-copy"><span class="eyebrow">{option.label}</span><strong>{option.title}</strong><small>{option.detail}</small></span>
+            <Arrow />
+          </a>
+        ))}
+      </div>
+      <form class="note" data-contact data-reveal>
+        <p class="eyebrow">Send a note</p>
+        <h2 class="title">Write to <em>the maison.</em></h2>
+        <div class="field"><label for="contact-name">Your name</label><input id="contact-name" name="name" autocomplete="name" required /></div>
+        <div class="field"><label for="contact-message">Your message</label><textarea id="contact-message" name="message" rows="5" placeholder="Ask us anything about VYBEIN…" required></textarea></div>
+        <button class="btn btn-ink" type="submit">Send on WhatsApp <Arrow /></button>
+        <p class="fine">Your note opens as a WhatsApp message to VYBEIN.</p>
+      </form>
+    </div>
+  </section>
+
+  <section class="section on-parchment">
+    <div class="container">
+      <div class="heading">
+        <span class="roman" data-reveal>Before you write</span>
+        <h2 class="title" data-reveal="rise">Quick <em>answers.</em></h2>
+      </div>
+      <div class="faq" data-reveal>
+        {faqs.map(([question, answer]) => <details><summary>{question}</summary><p>{answer}</p></details>)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { whatsappLink } from "../data/products";
+
+  const form = document.querySelector<HTMLFormElement>("[data-contact]");
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const data = new FormData(form);
+    const url = whatsappLink(`Hi VYBEIN, I’m ${data.get("name")}.\n\n${data.get("message")}`);
+    const tab = window.open(url, "_blank");
+    if (tab) tab.opener = null;
+    else window.location.assign(url);
+  });
+</script>
+
+<style>
+  .contact-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(48px, 7vw, 112px); align-items: start; }
+  .options { display: grid; border-top: 1px solid var(--line-light); }
+  .option { display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: 18px; padding: 30px 0; border-bottom: 1px solid var(--line-light); transition: padding .5s var(--ease), color .4s var(--ease); }
+  .option:hover { padding-left: 12px; color: var(--burgundy); }
+  .option-index { font-family: var(--serif); font-size: 2.4rem; font-weight: 300; line-height: 1; color: transparent; -webkit-text-stroke: 1px var(--gold-deep); }
+  .option-copy { display: grid; gap: 4px; }
+  .option-copy strong { font-family: var(--serif); font-size: 1.9rem; font-weight: 400; line-height: 1.1; }
+  .option-copy small { color: var(--muted-light); font-size: 14px; }
+  .note { display: grid; gap: 22px; padding: clamp(28px, 4vw, 52px); background: var(--parchment); border: 1px solid rgba(143, 110, 53, .22); }
+  .note .title { font-size: clamp(2rem, 3.4vw, 2.8rem); }
+  .fine { color: var(--muted-light); font-size: 12.5px; }
+  @media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; } }
+</style>

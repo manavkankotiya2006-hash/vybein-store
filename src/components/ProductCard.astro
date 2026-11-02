@@ -1,0 +1,39 @@
+---
+import { Picture } from "astro:assets";
+import { productNumber, productUrl, type Product } from "../data/products";
+import { productPhoto } from "../data/images";
+import { formatPrice } from "../lib/pricing";
+
+interface Props {
+  product: Product;
+  delay?: number;
+  /** Cards visible on arrival load straight away instead of lazily. */
+  eager?: boolean;
+}
+const { product, delay = 0, eager = false } = Astro.props;
+const href = productUrl(product);
+---
+<article class="card" data-reveal style={`--delay:${delay}s`} data-category={product.category.toLowerCase()}>
+  <a class="card-media arch" href={href} aria-label={`${product.code}, inspired by ${product.inspiredBy}`}>
+    <Picture
+      src={productPhoto(product.code)}
+      formats={["avif"]} fallbackFormat="webp"
+      widths={[360, 540, 760]}
+      sizes="(max-width: 760px) 46vw, (max-width: 1080px) 30vw, 300px"
+      alt={`VYBEIN ${product.code} 50 ml extrait de parfum`}
+      loading={eager ? "eager" : "lazy"}
+      fetchpriority={eager ? "high" : "auto"}
+    />
+    <span class="card-badge">{product.badge}</span>
+  </a>
+  <div class="card-body">
+    <p class="card-no">No. {productNumber(product)}</p>
+    <h3 class="card-title"><a href={href}>{product.code}</a></h3>
+    <p class="card-inspired">Inspired by {product.inspiredBy}</p>
+    <p class="card-meta">{product.category}</p>
+    <div class="card-foot">
+      <span class="price">{formatPrice(product.price)}<del>{formatPrice(product.originalPrice)}</del></span>
+      <button class="card-add" type="button" data-add-to-cart={product.id}>Add to bag</button>
+    </div>
+  </div>
+</article>

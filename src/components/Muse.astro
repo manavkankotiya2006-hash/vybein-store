@@ -1,0 +1,142 @@
+---
+// Rotating perfume lines. "band" is a full-width section; "inline" sits inside page content.
+import { MUSE_LINES } from "../data/muse";
+
+interface Props {
+  variant?: "band" | "inline";
+  label?: string;
+}
+const { variant = "inline", label = "The VYBEIN way" } = Astro.props;
+const roman = (value: number) => {
+  let text = "";
+  let remaining = value;
+  for (const [numeral, amount] of [["x", 10], ["ix", 9], ["v", 5], ["iv", 4], ["i", 1]] as const) {
+    while (remaining >= amount) {
+      text += numeral;
+      remaining -= amount;
+    }
+  }
+  return text;
+};
+---
+<div class:list={["muse", `muse-${variant}`]} data-muse data-random={variant === "inline" ? "" : undefined} role="region" aria-roledescription="rotating quotes" aria-label={label}>
+  <div class="muse-head">
+    <span class="eyebrow">{label}</span>
+    <span class="muse-count" aria-hidden="true" data-muse-count>{roman(1)} / {roman(MUSE_LINES.length)}</span>
+  </div>
+  <ol class="muse-lines" aria-live="off">
+    {MUSE_LINES.map((line, index) => (
+      <li class:list={{ "is-active": index === 0 }} aria-hidden={index === 0 ? undefined : "true"} data-roman={roman(index + 1)}>{line}</li>
+    ))}
+  </ol>
+  <div class="muse-foot">
+    <span class="muse-progress" aria-hidden="true"><i data-muse-progress></i></span>
+    <button class="muse-pause" type="button" aria-pressed="false" aria-label="Pause the rotating lines" data-muse-pause>
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path class="icon-pause" d="M3.5 2v8M8.5 2v8" /><path class="icon-play" d="M3 1.8 10 6l-7 4.2Z" /></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  const INTERVAL = 5200;
+
+  document.querySelectorAll<HTMLElement>("[data-muse]").forEach((muse) => {
+    const lines = [...muse.querySelectorAll<HTMLLIElement>(".muse-lines li")];
+    const count = muse.querySelector<HTMLElement>("[data-muse-count]");
+    const bar = muse.querySelector<HTMLElement>("[data-muse-progress]");
+    const pauseButton = muse.querySelector<HTMLButtonElement>("[data-muse-pause]");
+    const total = count?.textContent?.split("/")[1]?.trim() || "";
+    let index = muse.hasAttribute("data-random") ? Math.floor(Math.random() * lines.length) : 0;
+    let elapsed = 0;
+    let last = performance.now();
+    let paused = false;
+    let hovering = false;
+    let onScreen = false;
+
+    function show(next: number) {
+      const previous = lines[index];
+      index = (next + lines.length) % lines.length;
+      lines.forEach((line, lineIndex) => {
+        line.classList.toggle("is-active", lineIndex === index);
+        line.classList.toggle("is-leaving", line === previous && lineIndex !== index);
+        if (lineIndex === index) line.removeAttribute("aria-hidden");
+        else line.setAttribute("aria-hidden", "true");
+      });
+      if (count) count.textContent = `${lines[index].dataset.roman} / ${total}`;
+      elapsed = 0;
+    }
+    show(index);
+
+    // One clock per quote block. It only runs while on screen, and only
+    // advances while not paused or hovered.
+    let ticking = 0;
+    function frame(now: number) {
+      const delta = now - last;
+      last = now;
+      if (!paused && !hovering && !document.hidden) {
+        elapsed += delta;
+        if (elapsed >= INTERVAL) show(index + 1);
+      }
+      if (bar) bar.style.transform = `scaleX(${Math.min(1, elapsed / INTERVAL)})`;
+      ticking = onScreen ? requestAnimationFrame(frame) : 0;
+    }
+
+    new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      if (onScreen && !ticking) {
+        last = performance.now();
+        ticking = requestAnimationFrame(frame);
+      }
+    }).observe(muse);
+    muse.addEventListener("pointerenter", () => { hovering = true; });
+    muse.addEventListener("pointerleave", () => { hovering = false; });
+    muse.addEventListener("focusin", () => { hovering = true; });
+    muse.addEventListener("focusout", () => { hovering = false; });
+    pauseButton?.addEventListener("click", () => {
+      paused = !paused;
+      pauseButton.setAttribute("aria-pressed", String(paused));
+      pauseButton.setAttribute("aria-label", paused ? "Play the rotating lines" : "Pause the rotating lines");
+    });
+  });
+</script>
+
+<style>
+  .muse { display: grid; gap: 18px; }
+  .muse-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .muse-count { font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--gold); letter-spacing: .06em; }
+  .muse-lines { display: grid; margin: 0; padding: 0; list-style: none; }
+  .muse-lines li {
+    grid-area: 1 / 1;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.25;
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(18px);
+    transition: opacity 1s var(--ease-out), transform 1.1s var(--ease-out), filter 1s var(--ease-out);
+  }
+  .muse-lines li.is-active { opacity: 1; filter: none; transform: none; transition-delay: .25s; }
+  .muse-lines li.is-leaving { transform: translateY(-14px); transition-delay: 0s; }
+  .muse-foot { display: flex; align-items: center; gap: 16px; }
+  .muse-progress { position: relative; flex: 1; height: 1px; overflow: hidden; background: rgba(201, 164, 92, .2); }
+  .muse-progress i { position: absolute; inset: 0; background: var(--gold); transform: scaleX(0); transform-origin: left; }
+  .muse-pause { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 1px solid rgba(201, 164, 92, .35); border-radius: 50%; background: none; color: var(--gold); }
+  .muse-pause svg { width: 10px; }
+  .muse-pause path { fill: none; stroke: currentColor; stroke-width: 1.3; }
+  .muse-pause .icon-play { display: none; fill: currentColor; stroke: none; }
+  .muse-pause[aria-pressed="true"] .icon-pause { display: none; }
+  .muse-pause[aria-pressed="true"] .icon-play { display: block; }
+
+  .muse-band { max-width: 980px; margin-inline: auto; text-align: center; }
+  .muse-band .muse-head { justify-content: center; flex-direction: column; gap: 10px; }
+  .muse-band .muse-lines li { font-size: clamp(2rem, 4.6vw, 3.6rem); font-weight: 300; color: var(--on-dark); }
+  .muse-band .muse-foot { width: min(320px, 70%); margin: 14px auto 0; }
+
+  .muse-inline .muse-lines li { font-size: clamp(1.25rem, 1.8vw, 1.5rem); }
+  .muse-inline .muse-head .eyebrow { font-size: 9.5px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .muse-lines li { filter: none; transform: none; transition: opacity .01ms; }
+  }
+</style>

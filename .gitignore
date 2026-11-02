@@ -3,7 +3,7 @@
 Thumbs.db
 desktop.ini
 
-# Editor backup and workspace files
+# Editor files
 .vscode/
 .idea/
 *.swp
@@ -15,14 +15,16 @@ desktop.ini
 .env.*
 !.env.example
 
-# Logs, temporary files, and local browser checks
+# Logs and temporary files
 *.log
 *.tmp
 *.temp
-preview-*.png
-qa-*.png
 
-# Package and cache folders (the site itself needs no packages)
+# Dependencies, build output and generated types
 node_modules/
-.npm/
-.cache/
+dist/
+.astro/
+
+# Local Claude Code settings
+.claude/launch.json
+.claude/settings.local.json

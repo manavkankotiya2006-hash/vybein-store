@@ -1,31 +1,40 @@
 # VYBEIN
 
-A simple static storefront for VYBEIN unisex perfumes. It uses plain HTML, CSS, and JavaScript, so there is nothing to install or build.
+The storefront for VYBEIN unisex extraits de parfum, built with [Astro](https://astro.build). It is a static site: pages are generated ahead of time and hosted on GitHub Pages at `vybein.shop`. Orders are sent on WhatsApp; nothing is charged on the website.
 
-## Preview
+## Working on the site
 
-Open `index.html` in a browser. The shop, product pages, cart, and contact page work as a static website.
+You need Node.js 22.23 or newer.
 
-## Project files
+```sh
+npm install      # once
+npm run dev      # preview at http://localhost:4321 while you edit
+npm run build    # produce the finished site in dist/
+```
 
-- `index.html` — home page
-- `shop.html` — all perfumes and scent filters
-- `product.html` — product details, selected with a URL such as `product.html?id=1`
-- `cart.html` — saved cart, order summary, and WhatsApp checkout
-- `about.html` and `contact.html` — brand and contact information
-- `css/style.css` — site styles
-- `js/main.js` — cart, menu, filters, and WhatsApp forms
-- `js/products.js` — editable products and store settings
-- `images/` — local illustrations and placeholders
+## Where things live
 
-## Editing the products
+- `src/data/products.ts` — **the one place to edit** products, prices, WhatsApp number, Instagram, UPI ID and the Diwali offer. Every page reads from here.
+- `src/assets/products/` — product photos (`CODE-main.webp`). Astro resizes and compresses them automatically, so large originals are fine.
+- `public/textures/labels/` — front-label artwork (`CODE.webp`) shown on the 3D bottle.
+- `src/pages/` — one file per page. `perfumes/[slug].astro` generates a page for every perfume, such as `/perfumes/l-khm`.
+- `src/scripts/three/` — the 3D bottle (`bottle.ts`) and its stage (`stage.ts`).
+- `src/scripts/overture.ts` — the scroll-driven 3D story on the home page.
+- `src/data/muse.ts` — the rotating perfume lines and styling advice.
+- `src/styles/global.css` — colours, type and shared components.
 
-Update each product's label code, `inspiredBy`, category, notes, mood, description, sale price, original price, badge, and image path in `js/products.js`. Put product photos in `images/` and point each product's `image` value to its file.
+## Adding a perfume
 
-## Orders and launch details
-
-The cart is saved in the customer's browser. Checkout opens WhatsApp with the order, phone number, delivery address, and PIN code; payment is arranged in that chat. The live domain is `vybein.shop`.
+1. Add an entry to `PRODUCTS` in `src/data/products.ts` with a unique `id`, `code` and `slug`.
+2. Add its photo as `src/assets/products/CODE-main.webp`.
+3. Add its label artwork as `public/textures/labels/CODE.webp` (portrait, about 720 × 942 px; keep it under ~50 KB).
 
 ## Diwali offer
 
-The homepage and shop banners, automatic “buy 2, get 1 free” cart discount, and WhatsApp order details share one setting in `js/products.js`. After Diwali, set `STORE_CONFIG.diwaliOffer.active` to `false`. This hides both banners and turns off the discount. The three fragrance education guides are on the home page.
+`STORE.diwaliOffer` controls the banners and the automatic "buy 2, get 1 free" discount. Set `active` to `false` to turn it off, or set `endsAt` to a date such as `"2026-11-15T23:59:59+05:30"` and it switches itself off then.
+
+## Publishing
+
+Pushing to `main` builds and publishes the site through `.github/workflows/deploy.yml`. One-time setup: in the GitHub repository, open **Settings → Pages** and set **Source** to **GitHub Actions**.
+
+Links from the old site keep working: `shop.html`, `cart.html` and the other pages keep their names, and `product.html?id=N` redirects to the new perfume page.
