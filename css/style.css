@@ -97,7 +97,6 @@ h1 em, h2 em { font-weight: 400; }
 .product-art { position: relative; display: block; width: 100%; overflow: hidden; }
 .product-art-card { aspect-ratio: .81; transition: transform 600ms cubic-bezier(.2,.7,.2,1); }
 .product-art-base { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; transition: opacity 500ms ease; }
-.product-art-alternate { position: absolute; z-index: 1; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.025); transition: opacity 500ms ease, transform 700ms cubic-bezier(.2,.7,.2,1); pointer-events: none; }
 .product-art-profile { position: absolute; z-index: 1; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity 500ms ease; pointer-events: none; }
 .product-label-overlay { position: absolute; z-index: 1; top: 43%; left: 38.75%; width: 22.5%; height: 23.5%; border-radius: 2px; object-fit: contain; box-shadow: 0 2px 7px rgba(25, 20, 15, .2); pointer-events: none; }
 .product-card:hover .product-art-card { transform: scale(1.035); }
@@ -627,9 +626,8 @@ body {
 .product-detail-gallery { min-width: 0; touch-action: pan-y; }
 .product-detail-image::before { position: absolute; inset: 6% 8% 8%; border: 1px solid rgba(130, 98, 64, .22); border-radius: 48% 48% 2px 2px; content: ""; pointer-events: none; }
 .product-art-detail { position: relative; z-index: 0; width: 100%; min-height: 450px; border-radius: 48% 48% 1px 1px; }
-.product-art-detail .product-art-base, .product-art-detail .product-art-alternate { border-radius: 48% 48% 1px 1px; }
-.product-detail-gallery.showing-secondary .product-art-base, .product-detail-gallery.showing-profile .product-art-base, .product-detail-gallery.showing-profile .product-art-alternate { opacity: 0; }
-.product-detail-gallery.showing-secondary .product-art-alternate { opacity: 1; transform: scale(1); }
+.product-art-detail .product-art-base { border-radius: 48% 48% 1px 1px; }
+.product-detail-gallery.showing-profile .product-art-base { opacity: 0; }
 .product-detail-gallery.showing-profile .product-art-profile { opacity: 1; }
 /* The profile SVG is composed for the same tall arch as the bottle photo. */
 .product-detail-gallery-profile .product-art-detail .product-art-profile { border-radius: 48% 48% 1px 1px; }
@@ -854,7 +852,7 @@ body {
   .shop-hero::before, .shop-hero::after, .about-hero::before, .contact-hero::before, .contact-hero::after, .cart-heading::before, .cart-heading::after, .about-art > img, .about-art-note, .statement-orbit, .site-footer::before { animation: none !important; }
   .faq-item[open] > p { animation: none; }
   .scroll-progress { transition: none; }
-  .product-art-base, .product-art-alternate, .product-art-profile, .product-gallery-arrow { transition: none; }
+  .product-art-base, .product-art-profile, .product-gallery-arrow { transition: none; }
 }
 
 /* Price and product-label styling for the updated VYBEIN collection. */

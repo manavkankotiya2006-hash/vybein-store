@@ -16,7 +16,6 @@ const PRODUCTS = [
     notes: ["Cinnamon", "Dates", "Vanilla", "Amberwood"],
     description: "An indulgent blend of warm spices, sweet gourmand notes, and smooth vanilla. Deep, inviting, and beautifully comforting, this fragrance leaves a memorable trail wherever the night takes you.",
     image: "images/products/L-KHM-main.webp",
-    secondaryImage: "images/products/L-KHM-alt.webp",
     profileImage: "images/products/L-KHM-profile.svg",
     labelImage: null,
     badge: "Bestseller"
@@ -33,7 +32,6 @@ const PRODUCTS = [
     notes: ["Pineapple", "Bergamot", "Birch", "Musk"],
     description: "A bold blend of bright fruits and refined woods, creating a confident and sophisticated character. Fresh at first, smoky in its depth, and effortlessly memorable.",
     image: "images/products/C-AVT-main.webp",
-    secondaryImage: "images/products/C-AVT-alt.webp",
     profileImage: "images/products/C-AVT-profile.svg",
     labelImage: null,
     badge: "Iconic Fragrance"
@@ -50,7 +48,6 @@ const PRODUCTS = [
     notes: ["Amber", "Woody accords", "Musk", "Spices"],
     description: "A sophisticated combination of warm amber, smooth woods, and sensual musk. Rich yet balanced, this fragrance wraps you in an elegant trail that feels timeless.",
     image: "images/products/AJ-AW-main.webp",
-    secondaryImage: "images/products/AJ-AW-alt.webp",
     profileImage: "images/products/AJ-AW-profile.svg",
     labelImage: null,
     badge: "Rich & Elegant"
@@ -67,7 +64,6 @@ const PRODUCTS = [
     notes: ["Oud", "Sandalwood", "Cardamom", "Vanilla"],
     description: "An elegant woody composition built around precious oud, aromatic spices, and creamy sandalwood. Smooth, mysterious, and refined, it brings understated luxury to every occasion.",
     image: "images/products/TF-OW-main.webp",
-    secondaryImage: "images/products/TF-OW-alt.webp",
     profileImage: "images/products/TF-OW-profile.svg",
     labelImage: null,
     badge: "Luxury Collection"
@@ -84,7 +80,6 @@ const PRODUCTS = [
     notes: ["Bergamot", "Apple", "Aquatic accords", "Ambergris"],
     description: "An energetic blend of crisp fruits, refreshing aquatic notes, and warm amber undertones. Clean, vibrant, and effortlessly attractive, this fragrance is made for everyday confidence.",
     image: "images/products/R-HWS-main.webp",
-    secondaryImage: "images/products/R-HWS-alt.webp",
     profileImage: "images/products/R-HWS-profile.svg",
     labelImage: null,
     badge: "Fresh Favourite"
@@ -101,7 +96,6 @@ const PRODUCTS = [
     notes: ["Mint", "Green Apple", "Tonka Bean", "Vanilla"],
     description: "A striking combination of fresh mint, juicy fruit, and warm vanilla. Playful yet powerful, this fragrance balances freshness and sensual sweetness with a confident finish.",
     image: "images/products/V-ERS-main.webp",
-    secondaryImage: "images/products/V-ERS-alt.webp",
     profileImage: "images/products/V-ERS-profile.svg",
     labelImage: null,
     badge: "Bold & Magnetic"
@@ -120,7 +114,6 @@ const PRODUCTS = [
     // Real product photo: the printed label is already on the bottle, so no
     // separate label artwork is overlaid (see productArtwork in main.js).
     image: "images/products/D-SVG-main.webp",
-    secondaryImage: "images/products/D-SVG-alt.webp",
     profileImage: "images/products/D-SVG-profile.svg",
     labelImage: null,
     badge: "Signature Scent"
@@ -137,7 +130,6 @@ const PRODUCTS = [
     notes: ["Cardamom", "Pink Pepper", "Vanilla", "Chestnut accord"],
     description: "A captivating blend of aromatic spices, creamy sweetness, and warm chestnut-inspired notes. Smooth, comforting, and addictive, this fragrance is perfect for memorable evenings.",
     image: "images/products/A-SWY-main.webp",
-    secondaryImage: "images/products/A-SWY-alt.webp",
     profileImage: "images/products/A-SWY-profile.svg",
     labelImage: null,
     badge: "Addictive Warmth"

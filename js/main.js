@@ -32,11 +32,8 @@
   // Some products ship a real photo with the label already printed on the
   // bottle; those set labelImage to null and skip the overlay entirely.
   function productArtwork(product, altText, className) {
-    // Product cards show one main photo. The product page keeps its photo gallery.
-    const alternateSource = className === "product-art-detail" ? product.secondaryImage : "";
-    const alternateView = alternateSource && className === "product-art-detail"
-      ? `<img class="product-art-alternate" src="${escapeHTML(alternateSource)}" alt="" aria-hidden="true" loading="lazy">`
-      : "";
+    // Cards and product pages use the same single bottle photo. The profile
+    // illustration remains available as the product page's second gallery view.
     const profileView = className === "product-art-detail" && product.profileImage
       ? `<img class="product-art-profile" src="${escapeHTML(product.profileImage)}" alt="" aria-hidden="true" loading="lazy">`
       : "";
@@ -46,7 +43,6 @@
     return `
       <span class="product-art ${className}">
         <img class="product-art-base" src="${escapeHTML(product.image)}" alt="${escapeHTML(altText)}" loading="lazy">
-        ${alternateView}
         ${profileView}
         ${labelOverlay}
       </span>`;
@@ -182,42 +178,23 @@
   }
 
   function setProductGalleryImage(gallery, imageIndex) {
-    const showingSecondary = imageIndex === 1;
-    const showingProfile = imageIndex === 2;
+    const showingProfile = imageIndex === 1;
     gallery.dataset.activeImage = String(imageIndex);
-    gallery.classList.toggle("showing-secondary", showingSecondary);
     gallery.classList.toggle("showing-profile", showingProfile);
     const status = gallery.querySelector("[data-product-image-status]");
-    const totalImages = gallery.querySelector(".product-art-profile") ? 3 : 2;
+    const totalImages = gallery.querySelector(".product-art-profile") ? 2 : 1;
     if (status) status.textContent = `Photo ${imageIndex + 1} of ${totalImages}`;
   }
 
   function stepProductGallery(gallery, step) {
     const currentIndex = Number(gallery.dataset.activeImage) || 0;
-    const totalImages = gallery.querySelector(".product-art-profile") ? 3 : 2;
-    gallery.dataset.hoverPreview = "false";
+    const totalImages = gallery.querySelector(".product-art-profile") ? 2 : 1;
     setProductGalleryImage(gallery, (currentIndex + step + totalImages) % totalImages);
   }
 
   function setupProductGallery(gallery) {
     if (!gallery) return;
     let touchStart = null;
-    const artwork = gallery.querySelector(".product-art-detail");
-
-    // On a mouse, preview the real second listing photo while the bottle is hovered.
-    if (artwork) {
-      artwork.addEventListener("pointerenter", (event) => {
-        if (event.pointerType !== "mouse" || (Number(gallery.dataset.activeImage) || 0) !== 0) return;
-        gallery.dataset.hoverPreview = "true";
-        setProductGalleryImage(gallery, 1);
-      });
-      artwork.addEventListener("pointerleave", () => {
-        if (gallery.dataset.hoverPreview !== "true") return;
-        gallery.dataset.hoverPreview = "false";
-        setProductGalleryImage(gallery, 0);
-      });
-    }
-
     gallery.addEventListener("keydown", (event) => {
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
       event.preventDefault();
@@ -273,7 +250,7 @@
         <div class="product-detail-image">${productArtwork(product, `VYBEIN ${safeName} 50 ml perfume bottle with its printed fragrance label`, "product-art-detail")}<span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span>
           <button class="product-gallery-arrow product-gallery-previous" type="button" data-product-image-step="-1" aria-label="Show previous product image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg></button>
           <button class="product-gallery-arrow product-gallery-next" type="button" data-product-image-step="1" aria-label="Show next product image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></button>
-          <span class="visually-hidden" aria-live="polite" data-product-image-status>Photo 1 of 3</span>
+          <span class="visually-hidden" aria-live="polite" data-product-image-status>Photo 1 of 2</span>
         </div>
       </div>
       <section class="product-detail-copy" data-reveal>
