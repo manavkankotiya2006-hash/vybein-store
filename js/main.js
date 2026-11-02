@@ -175,6 +175,44 @@
     applyFilter();
   }
 
+  function setProductGalleryImage(gallery, imageIndex) {
+    const showingSecondary = imageIndex === 1;
+    gallery.dataset.activeImage = String(imageIndex);
+    gallery.classList.toggle("showing-secondary", showingSecondary);
+    const status = gallery.querySelector("[data-product-image-status]");
+    if (status) status.textContent = showingSecondary ? "Photo 2 of 2" : "Photo 1 of 2";
+  }
+
+  function stepProductGallery(gallery, step) {
+    const currentIndex = Number(gallery.dataset.activeImage) || 0;
+    setProductGalleryImage(gallery, (currentIndex + step + 2) % 2);
+  }
+
+  function setupProductGallery(gallery) {
+    if (!gallery) return;
+    let touchStart = null;
+
+    gallery.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      event.preventDefault();
+      stepProductGallery(gallery, event.key === "ArrowRight" ? 1 : -1);
+    });
+
+    gallery.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "touch") touchStart = { x: event.clientX, y: event.clientY };
+    });
+    gallery.addEventListener("pointerup", (event) => {
+      if (!touchStart) return;
+      const deltaX = event.clientX - touchStart.x;
+      const deltaY = event.clientY - touchStart.y;
+      if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+        stepProductGallery(gallery, deltaX < 0 ? 1 : -1);
+      }
+      touchStart = null;
+    });
+    gallery.addEventListener("pointercancel", () => { touchStart = null; });
+  }
+
   function renderProductDetail() {
     const target = document.getElementById("product-detail");
     if (!target) return;
@@ -206,8 +244,11 @@
 
     target.innerHTML = `
       <div class="product-detail-gallery" data-reveal>
-        <div class="product-detail-image">${productArtwork(product, `VYBEIN ${safeName} 50 ml perfume bottle with its printed fragrance label`, "product-art-detail")}<span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span></div>
-        <button class="product-image-switch" type="button" data-product-image-switch aria-pressed="false"><span data-image-switch-label>See second image</span><span class="icon-arrow" aria-hidden="true"></span></button>
+        <div class="product-detail-image">${productArtwork(product, `VYBEIN ${safeName} 50 ml perfume bottle with its printed fragrance label`, "product-art-detail")}<span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span>
+          <button class="product-gallery-arrow product-gallery-previous" type="button" data-product-image-step="-1" aria-label="Show previous product image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg></button>
+          <button class="product-gallery-arrow product-gallery-next" type="button" data-product-image-step="1" aria-label="Show next product image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></button>
+          <span class="visually-hidden" aria-live="polite" data-product-image-status>Photo 1 of 2</span>
+        </div>
       </div>
       <section class="product-detail-copy" data-reveal>
         <p class="eyebrow">VYBEIN · ${safeCategory.toUpperCase()}</p>
@@ -221,6 +262,7 @@
         <button class="detail-share" type="button" data-share-product="${escapeHTML(product.id)}">Share this scent <span class="icon-arrow" aria-hidden="true"></span></button>
       </section>`;
 
+    setupProductGallery(target.querySelector(".product-detail-gallery"));
     if (relatedTarget) relatedTarget.innerHTML = PRODUCTS.filter((item) => item.id !== product.id).slice(0, 3).map(productCard).join("");
     observeRevealElements(target);
     if (relatedTarget) observeRevealElements(relatedTarget);
@@ -482,14 +524,10 @@
 
   function setupQuantityControls() {
     document.addEventListener("click", (event) => {
-      const imageSwitch = event.target.closest("[data-product-image-switch]");
-      if (imageSwitch) {
-        const gallery = imageSwitch.closest(".product-detail-gallery");
-        if (gallery) {
-          const showingSecondary = gallery.classList.toggle("showing-secondary");
-          imageSwitch.setAttribute("aria-pressed", String(showingSecondary));
-          imageSwitch.querySelector("[data-image-switch-label]").textContent = showingSecondary ? "See main image" : "See second image";
-        }
+      const imageStep = event.target.closest("[data-product-image-step]");
+      if (imageStep) {
+        const gallery = imageStep.closest(".product-detail-gallery");
+        if (gallery) stepProductGallery(gallery, Number(imageStep.dataset.productImageStep));
         return;
       }
       const addButton = event.target.closest("[data-add-to-cart]");
