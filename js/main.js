@@ -32,8 +32,11 @@
   // Some products ship a real photo with the label already printed on the
   // bottle; those set labelImage to null and skip the overlay entirely.
   function productArtwork(product, altText, className) {
-    const alternateView = product.secondaryImage && ["product-art-card", "product-art-detail"].includes(className)
-      ? `<img class="product-art-alternate" src="${escapeHTML(product.secondaryImage)}" alt="" aria-hidden="true" loading="lazy">`
+    const alternateSource = className === "product-art-card"
+      ? (product.hoverImage || product.secondaryImage)
+      : product.secondaryImage;
+    const alternateView = alternateSource && ["product-art-card", "product-art-detail"].includes(className)
+      ? `<img class="product-art-alternate" src="${escapeHTML(alternateSource)}" alt="" aria-hidden="true" loading="lazy">`
       : "";
     const labelOverlay = product.labelImage
       ? `<img class="product-label-overlay" src="${escapeHTML(product.labelImage)}" alt="" aria-hidden="true" loading="lazy">`
