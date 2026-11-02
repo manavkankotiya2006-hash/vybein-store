@@ -34,9 +34,12 @@
   function productArtwork(product, altText, className) {
     const alternateSource = className === "product-art-card"
       ? (product.hoverImage || product.secondaryImage)
-      : product.secondaryImage;
+      : (product.secondaryImage || product.hoverImage);
     const alternateView = alternateSource && ["product-art-card", "product-art-detail"].includes(className)
       ? `<img class="product-art-alternate" src="${escapeHTML(alternateSource)}" alt="" aria-hidden="true" loading="lazy">`
+      : "";
+    const profileView = className === "product-art-detail" && product.profileImage
+      ? `<img class="product-art-profile" src="${escapeHTML(product.profileImage)}" alt="" aria-hidden="true" loading="lazy">`
       : "";
     const labelOverlay = product.labelImage
       ? `<img class="product-label-overlay" src="${escapeHTML(product.labelImage)}" alt="" aria-hidden="true" loading="lazy">`
@@ -45,6 +48,7 @@
       <span class="product-art ${className}">
         <img class="product-art-base" src="${escapeHTML(product.image)}" alt="${escapeHTML(altText)}" loading="lazy">
         ${alternateView}
+        ${profileView}
         ${labelOverlay}
       </span>`;
   }
@@ -180,20 +184,40 @@
 
   function setProductGalleryImage(gallery, imageIndex) {
     const showingSecondary = imageIndex === 1;
+    const showingProfile = imageIndex === 2;
     gallery.dataset.activeImage = String(imageIndex);
     gallery.classList.toggle("showing-secondary", showingSecondary);
+    gallery.classList.toggle("showing-profile", showingProfile);
     const status = gallery.querySelector("[data-product-image-status]");
-    if (status) status.textContent = showingSecondary ? "Photo 2 of 2" : "Photo 1 of 2";
+    const totalImages = gallery.querySelector(".product-art-profile") ? 3 : 2;
+    if (status) status.textContent = `Photo ${imageIndex + 1} of ${totalImages}`;
   }
 
   function stepProductGallery(gallery, step) {
     const currentIndex = Number(gallery.dataset.activeImage) || 0;
-    setProductGalleryImage(gallery, (currentIndex + step + 2) % 2);
+    const totalImages = gallery.querySelector(".product-art-profile") ? 3 : 2;
+    gallery.dataset.hoverPreview = "false";
+    setProductGalleryImage(gallery, (currentIndex + step + totalImages) % totalImages);
   }
 
   function setupProductGallery(gallery) {
     if (!gallery) return;
     let touchStart = null;
+    const artwork = gallery.querySelector(".product-art-detail");
+
+    // On a mouse, preview the real second listing photo while the bottle is hovered.
+    if (artwork) {
+      artwork.addEventListener("pointerenter", (event) => {
+        if (event.pointerType !== "mouse" || (Number(gallery.dataset.activeImage) || 0) !== 0) return;
+        gallery.dataset.hoverPreview = "true";
+        setProductGalleryImage(gallery, 1);
+      });
+      artwork.addEventListener("pointerleave", () => {
+        if (gallery.dataset.hoverPreview !== "true") return;
+        gallery.dataset.hoverPreview = "false";
+        setProductGalleryImage(gallery, 0);
+      });
+    }
 
     gallery.addEventListener("keydown", (event) => {
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
@@ -246,11 +270,11 @@
     if (ogUrl) ogUrl.content = window.location.href;
 
     target.innerHTML = `
-      <div class="product-detail-gallery${String(product.secondaryImage || "").toLowerCase().endsWith(".svg") ? " product-detail-gallery-profile" : ""}" data-reveal>
+      <div class="product-detail-gallery${String(product.profileImage || "").toLowerCase().endsWith(".svg") ? " product-detail-gallery-profile" : ""}" data-reveal>
         <div class="product-detail-image">${productArtwork(product, `VYBEIN ${safeName} 50 ml perfume bottle with its printed fragrance label`, "product-art-detail")}<span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span>
           <button class="product-gallery-arrow product-gallery-previous" type="button" data-product-image-step="-1" aria-label="Show previous product image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18 9 12l6-6" /></svg></button>
           <button class="product-gallery-arrow product-gallery-next" type="button" data-product-image-step="1" aria-label="Show next product image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></button>
-          <span class="visually-hidden" aria-live="polite" data-product-image-status>Photo 1 of 2</span>
+          <span class="visually-hidden" aria-live="polite" data-product-image-status>Photo 1 of 3</span>
         </div>
       </div>
       <section class="product-detail-copy" data-reveal>
