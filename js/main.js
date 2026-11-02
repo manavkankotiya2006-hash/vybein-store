@@ -32,8 +32,8 @@
   // Some products ship a real photo with the label already printed on the
   // bottle; those set labelImage to null and skip the overlay entirely.
   function productArtwork(product, altText, className) {
-    const alternateView = className === "product-art-card"
-      ? `<img class="product-art-alternate" src="${escapeHTML(product.image)}" alt="" aria-hidden="true" loading="lazy">`
+    const alternateView = product.secondaryImage && ["product-art-card", "product-art-detail"].includes(className)
+      ? `<img class="product-art-alternate" src="${escapeHTML(product.secondaryImage)}" alt="" aria-hidden="true" loading="lazy">`
       : "";
     const labelOverlay = product.labelImage
       ? `<img class="product-label-overlay" src="${escapeHTML(product.labelImage)}" alt="" aria-hidden="true" loading="lazy">`
@@ -205,7 +205,10 @@
     if (ogUrl) ogUrl.content = window.location.href;
 
     target.innerHTML = `
-      <div class="product-detail-image" data-reveal>${productArtwork(product, `VYBEIN ${safeName} 50 ml perfume bottle with its printed fragrance label`, "product-art-detail")}<span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span></div>
+      <div class="product-detail-gallery" data-reveal>
+        <div class="product-detail-image">${productArtwork(product, `VYBEIN ${safeName} 50 ml perfume bottle with its printed fragrance label`, "product-art-detail")}<span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span></div>
+        <button class="product-image-switch" type="button" data-product-image-switch aria-pressed="false"><span data-image-switch-label>See second image</span><span class="icon-arrow" aria-hidden="true"></span></button>
+      </div>
       <section class="product-detail-copy" data-reveal>
         <p class="eyebrow">VYBEIN · ${safeCategory.toUpperCase()}</p>
         <h1>${safeName}</h1><p class="detail-inspired">Inspired By ${safeInspiredBy}</p><p class="detail-volume">${escapeHTML(product.volume || "50 ml")}</p>
@@ -479,6 +482,16 @@
 
   function setupQuantityControls() {
     document.addEventListener("click", (event) => {
+      const imageSwitch = event.target.closest("[data-product-image-switch]");
+      if (imageSwitch) {
+        const gallery = imageSwitch.closest(".product-detail-gallery");
+        if (gallery) {
+          const showingSecondary = gallery.classList.toggle("showing-secondary");
+          imageSwitch.setAttribute("aria-pressed", String(showingSecondary));
+          imageSwitch.querySelector("[data-image-switch-label]").textContent = showingSecondary ? "See main image" : "See second image";
+        }
+        return;
+      }
       const addButton = event.target.closest("[data-add-to-cart]");
       if (addButton) {
         addToCart(addButton.dataset.addToCart, Number(addButton.dataset.quantity) || 1);
