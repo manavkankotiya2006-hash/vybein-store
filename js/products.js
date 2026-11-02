@@ -14,8 +14,8 @@ const PRODUCTS = [
     mood: "A rich, irresistible warmth made for unforgettable nights.",
     notes: ["Cinnamon", "Dates", "Vanilla", "Amberwood"],
     description: "An indulgent blend of warm spices, sweet gourmand notes, and smooth vanilla. Deep, inviting, and beautifully comforting, this fragrance leaves a memorable trail wherever the night takes you.",
-    image: "images/midnight-bloom.svg",
-    labelImage: "images/labels/L-KHM.webp",
+    image: "images/products/L-KHM-main.webp",
+    labelImage: null,
     badge: "Bestseller"
   },
   {
@@ -28,8 +28,8 @@ const PRODUCTS = [
     mood: "Confidence has its own signature.",
     notes: ["Pineapple", "Bergamot", "Birch", "Musk"],
     description: "A bold blend of bright fruits and refined woods, creating a confident and sophisticated character. Fresh at first, smoky in its depth, and effortlessly memorable.",
-    image: "images/amber-veil.svg",
-    labelImage: "images/labels/C-AVT.webp",
+    image: "images/products/C-AVT-main.webp",
+    labelImage: null,
     badge: "Iconic Fragrance"
   },
   {
@@ -42,8 +42,8 @@ const PRODUCTS = [
     mood: "A golden warmth that speaks without words.",
     notes: ["Amber", "Woody accords", "Musk", "Spices"],
     description: "A sophisticated combination of warm amber, smooth woods, and sensual musk. Rich yet balanced, this fragrance wraps you in an elegant trail that feels timeless.",
-    image: "images/citrus-muse.svg",
-    labelImage: "images/labels/AJ-AW.webp",
+    image: "images/products/AJ-AW-main.webp",
+    labelImage: null,
     badge: "Rich & Elegant"
   },
   {
@@ -70,8 +70,8 @@ const PRODUCTS = [
     mood: "A refreshing rush with an unforgettable finish.",
     notes: ["Bergamot", "Apple", "Aquatic accords", "Ambergris"],
     description: "An energetic blend of crisp fruits, refreshing aquatic notes, and warm amber undertones. Clean, vibrant, and effortlessly attractive, this fragrance is made for everyday confidence.",
-    image: "images/santal-skin.svg",
-    labelImage: "images/labels/R-HWS.webp",
+    image: "images/products/R-HWS-main.webp",
+    labelImage: null,
     badge: "Fresh Favourite"
   },
   {
@@ -84,8 +84,8 @@ const PRODUCTS = [
     mood: "Made to attract. Remembered for its presence.",
     notes: ["Mint", "Green Apple", "Tonka Bean", "Vanilla"],
     description: "A striking combination of fresh mint, juicy fruit, and warm vanilla. Playful yet powerful, this fragrance balances freshness and sensual sweetness with a confident finish.",
-    image: "images/rose-afterglow.svg",
-    labelImage: "images/labels/V-ERS.webp",
+    image: "images/products/V-ERS-main.webp",
+    labelImage: null,
     badge: "Bold & Magnetic"
   },
   {
@@ -100,7 +100,7 @@ const PRODUCTS = [
     description: "A crisp burst of fresh citrus meets aromatic spices and a deep woody-amber finish. Bold, modern, and versatile, it creates a distinctive presence from day to night.",
     // Real product photo: the printed label is already on the bottle, so no
     // separate label artwork is overlaid (see productArtwork in main.js).
-    image: "images/D-SVG-product.webp",
+    image: "images/products/D-SVG-main.webp",
     labelImage: null,
     badge: "Signature Scent"
   },
@@ -114,8 +114,8 @@ const PRODUCTS = [
     mood: "A warm embrace that stays long after goodbye.",
     notes: ["Cardamom", "Pink Pepper", "Vanilla", "Chestnut accord"],
     description: "A captivating blend of aromatic spices, creamy sweetness, and warm chestnut-inspired notes. Smooth, comforting, and addictive, this fragrance is perfect for memorable evenings.",
-    image: "images/golden-hour.svg",
-    labelImage: "images/labels/A-SWY.webp",
+    image: "images/products/A-SWY-main.webp",
+    labelImage: null,
     badge: "Addictive Warmth"
   }
 ];
