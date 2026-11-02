@@ -32,12 +32,16 @@
   // Some products ship a real photo with the label already printed on the
   // bottle; those set labelImage to null and skip the overlay entirely.
   function productArtwork(product, altText, className) {
+    const alternateView = className === "product-art-card"
+      ? `<img class="product-art-alternate" src="${escapeHTML(product.image)}" alt="" aria-hidden="true" loading="lazy">`
+      : "";
     const labelOverlay = product.labelImage
       ? `<img class="product-label-overlay" src="${escapeHTML(product.labelImage)}" alt="" aria-hidden="true" loading="lazy">`
       : "";
     return `
       <span class="product-art ${className}">
         <img class="product-art-base" src="${escapeHTML(product.image)}" alt="${escapeHTML(altText)}" loading="lazy">
+        ${alternateView}
         ${labelOverlay}
       </span>`;
   }
@@ -116,13 +120,13 @@
     return `
       <article class="product-card" data-reveal>
         <a class="product-card-image" href="product.html?id=${id}" aria-label="View ${name}">
-          ${productArtwork(product, `VYBEIN ${name}, inspired by ${inspiredBy}, in a perfume bottle with its printed label`, "product-art-card")}
+          ${productArtwork(product, `VYBEIN ${name}, inspired by ${inspiredBy}, 50 ml perfume bottle with its printed label`, "product-art-card")}
           <span class="product-badge">${badge}</span>
         </a>
         <div class="product-card-info">
           <div class="product-card-title-row"><h3><a href="product.html?id=${id}">${name}</a></h3></div>
           <p class="product-card-inspired">Inspired By ${inspiredBy}</p>
-          <div class="product-card-price">${priceMarkup(product)}</div>
+          <div class="product-card-price-row"><div class="product-card-price">${priceMarkup(product)}</div><span class="product-card-volume">${escapeHTML(product.volume || "50 ml")}</span></div>
           <p class="product-card-category">${category}</p>
           <p class="product-card-mood">${notes}</p>
           <div class="product-card-actions"><button class="add-button" type="button" data-add-to-cart="${escapeHTML(product.id)}">Add to bag <span aria-hidden="true">+</span></button><a class="quick-view" href="product.html?id=${id}">Discover <span class="icon-arrow" aria-hidden="true"></span></a></div>
@@ -201,10 +205,10 @@
     if (ogUrl) ogUrl.content = window.location.href;
 
     target.innerHTML = `
-      <div class="product-detail-image" data-reveal>${productArtwork(product, `VYBEIN ${safeName} perfume bottle with its printed fragrance label`, "product-art-detail")}<span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span></div>
+      <div class="product-detail-image" data-reveal>${productArtwork(product, `VYBEIN ${safeName} 50 ml perfume bottle with its printed fragrance label`, "product-art-detail")}<span class="product-image-caption">VYBEIN · FRAGRANCE ${String(product.id).padStart(2, "0")}</span></div>
       <section class="product-detail-copy" data-reveal>
         <p class="eyebrow">VYBEIN · ${safeCategory.toUpperCase()}</p>
-        <h1>${safeName}</h1><p class="detail-inspired">Inspired By ${safeInspiredBy}</p>
+        <h1>${safeName}</h1><p class="detail-inspired">Inspired By ${safeInspiredBy}</p><p class="detail-volume">${escapeHTML(product.volume || "50 ml")}</p>
         <div class="detail-price">${priceMarkup(product)}<span class="price-saving">Save ${formatPrice((product.originalPrice || STORE_CONFIG.originalPrice) - (product.price || STORE_CONFIG.price))}</span></div>
         <p class="detail-mood">${escapeHTML(product.mood)}</p>
         <p class="detail-description">${escapeHTML(product.description)}</p>
