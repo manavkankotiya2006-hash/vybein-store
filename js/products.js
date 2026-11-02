@@ -114,7 +114,7 @@ const PRODUCTS = [
     // Real product photo: the printed label is already on the bottle, so no
     // separate label artwork is overlaid (see productArtwork in main.js).
     image: "images/products/D-SVG-main.webp",
-    secondaryImage: "images/products/D-SVG-alt.webp",
+    secondaryImage: "images/products/D-SVG-profile.svg",
     labelImage: null,
     badge: "Signature Scent"
   },
