@@ -56,8 +56,8 @@ const PRODUCTS = [
     mood: "Dark woods. Quiet luxury. Timeless presence.",
     notes: ["Oud", "Sandalwood", "Cardamom", "Vanilla"],
     description: "An elegant woody composition built around precious oud, aromatic spices, and creamy sandalwood. Smooth, mysterious, and refined, it brings understated luxury to every occasion.",
-    image: "images/velvet-oud.svg",
-    labelImage: "images/labels/TF-OW.webp",
+    image: "images/products/TF-OW-main.webp",
+    labelImage: null,
     badge: "Luxury Collection"
   },
   {
