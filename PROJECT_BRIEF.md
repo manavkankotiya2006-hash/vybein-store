@@ -2,7 +2,7 @@
 
 ## Products and customers
 - Unisex perfumes
-- 8 perfumes, sale price Rs. 899 each (original price Rs. 1,299)
+- 8 perfumes, sale price Rs. 799 each (original price Rs. 1,299)
 - Target customers: anyone shopping for unisex perfumes
 
 ## Brand and design

@@ -411,6 +411,7 @@ const ritual = [
   .finder-moods button[aria-selected="true"] small { color: var(--gold-soft); }
   .finder-results { padding-top: 8px; }
   .finder-panel { display: grid; gap: 0; border-top: 1px solid var(--line-light); animation: panelIn .8s var(--ease-out); }
+  .finder-panel[hidden] { display: none; }
   @keyframes panelIn { from { opacity: 0; transform: translateY(14px); } }
   .finder-match { display: grid; grid-template-columns: 96px 1fr auto; gap: 26px; align-items: center; padding: 22px 0; border-bottom: 1px solid var(--line-light); transition: padding .5s var(--ease); }
   .finder-match:hover { padding-left: 10px; }

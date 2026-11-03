@@ -1,0 +1,1 @@
+import{a as e}from"./products.CU0x7Uk2.js";var t=document.querySelector(`[data-contact]`);t?.addEventListener(`submit`,n=>{if(n.preventDefault(),!t.reportValidity())return;let r=new FormData(t),i=e(`Hi VYBEIN, I’m ${r.get(`name`)}.\n\n${r.get(`message`)}`),a=window.open(i,`_blank`);a?a.opener=null:window.location.assign(i)});
